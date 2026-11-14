@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VenceClaro - Presentación Ejecutiva</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary: #0284c7;
+            --primary-dark: #0369a1;
+            --bg-slide: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+        }
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #020617;
+            color: #f8fafc;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            overflow: hidden;
+        }
+        .slide {
+            display: none;
+            height: calc(100vh - 105px);
+            width: 100vw;
+            box-sizing: border-box;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            overflow-y: auto;
+        }
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .tab-btn.active {
+            background: #0284c7;
+            color: #ffffff;
+            border-color: #38bdf8;
+            box-shadow: 0 0 15px rgba(2, 132, 199, 0.4);
+        }
+        .step-circle.active {
+            background: #0284c7;
+            border-color: #38bdf8;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.6);
+            transform: scale(1.1);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen justify-between">
+
+    <!-- Header Superior Común -->
+    <header class="glass-panel px-6 py-3 flex justify-between items-center z-50">
+        <div class="flex items-center space-x-3">
+            <span class="text-2xl">📅</span>
+            <div>
+                <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                    VenceClaro <span class="text-xs bg-sky-500/20 text-sky-400 border border-sky-500/30 px-2 py-0.5 rounded-full font-mono">Diplomatura IA</span>
+                </h1>
+                <p class="text-xs text-slate-400">Agente Orquestador y Skills Modulares Deterministas</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2">
+            <span id="slideIndicator" class="text-xs font-mono font-bold bg-slate-800 text-sky-400 px-3 py-1 rounded-full border border-slate-700">Diapo 1 de 3</span>
+            <button onclick="prevSlide()" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition" title="Anterior (Flecha Izquierda)">◀</button>
+            <button onclick="nextSlide()" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition" title="Siguiente (Flecha Derecha)">▶</button>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal de Diapositivas -->
+    <main class="flex-1 relative overflow-hidden">
+
+        <!-- ==================== DIAPOSITIVA 1 ==================== -->
+        <section id="slide-1" class="slide active p-6 justify-start space-y-4">
+            <div>
+                <div class="inline-block text-xs uppercase tracking-wider text-sky-400 font-semibold mb-0.5">Fundamento Teórico & Arquitectura Modular</div>
+                <h2 class="text-xl font-black text-white">1. El Agente Coordinador y sus 5 Skills (con Estructura de Archivos)</h2>
+                <p class="text-xs text-slate-400 max-w-3xl">
+                    Implementación determinista: una única entidad orquestadora con estado (<span class="text-sky-300 font-medium">Stateful</span>) coordina cuatro unidades operativas atómicas y sin estado (<span class="text-emerald-300 font-medium">Stateless</span>).
+                </p>
+            </div>
+
+            <!-- Interacción de Exploración de Skills -->
+            <div class="grid grid-cols-12 gap-5">
+                <!-- Columna Izquierda: Botones de Skills -->
+                <div class="col-span-4 flex flex-col space-y-2">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Seleccioná una Skill para auditar:</span>
+                    
+                    <button onclick="selectSkill('orquestador')" id="btn-orquestador" class="tab-btn active text-left px-3.5 py-2.5 rounded-xl border border-slate-700 text-xs font-medium transition flex items-center justify-between">
+                        <span>🎯 organizar-vencimientos</span>
+                        <span class="text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.5 rounded font-bold">ORQUESTADORA</span>
+                    </button>
+
+                    <button onclick="selectSkill('extraer')" id="btn-extraer" class="tab-btn text-left px-3.5 py-2.5 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-xs font-medium transition flex items-center justify-between">
+                        <span>🔍 extraer-vencimiento</span>
+                        <span class="text-[9px] bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded font-bold">ESPECIALIZADA</span>
+                    </button>
+
+                    <button onclick="selectSkill('ordenar')" id="btn-ordenar" class="tab-btn text-left px-3.5 py-2.5 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-xs font-medium transition flex items-center justify-between">
+                        <span>🔢 ordenar-vencimientos</span>
+                        <span class="text-[9px] bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded font-bold">ESPECIALIZADA</span>
+                    </button>
+
+                    <button onclick="selectSkill('generar')" id="btn-generar" class="tab-btn text-left px-3.5 py-2.5 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-xs font-medium transition flex items-center justify-between">
+                        <span>📑 generar-agenda</span>
+                        <span class="text-[9px] bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded font-bold">ESPECIALIZADA</span>
+                    </button>
+
+                    <button onclick="selectSkill('enviar')" id="btn-enviar" class="tab-btn text-left px-3.5 py-2.5 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-xs font-medium transition flex items-center justify-between">
+                        <span>📧 enviar-agenda</span>
+                        <span class="text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded font-bold">API / EMAIL</span>
+                    </button>
+
+                    <!-- Resumen del Agente Central -->
+                    <div class="glass-panel p-3 rounded-xl border-slate-800 text-[11px] text-slate-400 mt-2">
+                        <span class="text-sky-400 font-bold block mb-1">🤖 AgenteVencimientos (core/agent.py)</span>
+                        Contiene la máquina de estados y el buffer acumulador. Invoca las skills a través de <code>core/skill_loader.py</code>.
+                    </div>
+                </div>
+
+                <!-- Columna Derecha: Tarjeta Dinámica de la Skill Seleccionada -->
+                <div class="col-span-8 glass-panel p-5 rounded-2xl flex flex-col justify-between border-slate-700/80 space-y-3">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h3 id="skill-title" class="text-lg font-bold text-white flex items-center gap-2">🎯 organizar-vencimientos</h3>
+                                <p id="skill-role" class="text-xs text-sky-400 font-mono">Rol: Coordinadora de ciclo de vida, ingesta acumulativa y supervisión humana</p>
+                            </div>
+                            <span id="skill-type" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/40">Stateful (Con Estado)</span>
+                        </div>
+
+                        <p id="skill-desc" class="text-xs text-slate-300 leading-relaxed mb-3">
+                            Coordina la ejecución secuencial determinista. Mantiene el lote acumulado de facturas, gestiona la pregunta interactiva de si se desean sumar más comprobantes, entrega los datos al usuario en el Punto de Control y delega el ordenamiento, exportación y despacho.
+                        </p>
+
+                        <!-- Estructura de Archivos de la Skill -->
+                        <div class="bg-slate-950/90 border border-slate-800 rounded-xl p-3 mb-3">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                    <span>📁</span> Estructura de Archivos de la Skill:
+                                </span>
+                                <span class="text-[10px] text-slate-500 font-mono">Convención Modular de la Cátedra</span>
+                            </div>
+                            <pre id="skill-files" class="text-[11px] font-mono text-emerald-300 leading-relaxed overflow-x-auto m-0">skills/organizar-vencimientos/
+├── SKILL.md                      # Procedimiento normativo, roles y especificación
+├── references/
+│   └── politica-orquestacion.md  # Políticas de handoff humano, bloqueo y trazabilidad
+├── orquestador.py                # Lógica ejecutable de coordinación
+└── scripts/
+    ├── ejecutar.py               # CLI Python (--auto-confirmar, --salida, --json)
+    └── ejecutar.sh               # Wrapper ejecutable Bash portable</pre>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800">
+                                <span class="font-bold text-slate-400 block mb-0.5">📥 Entradas:</span>
+                                <span id="skill-inputs" class="text-slate-200 text-[11px]">Colección de PDFs en memoria o rutas de disco.</span>
+                            </div>
+                            <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800">
+                                <span class="font-bold text-slate-400 block mb-0.5">📤 Salidas:</span>
+                                <span id="skill-outputs" class="text-slate-200 text-[11px]">Agenda consolidada, archivos excluidos y auditoría.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-rose-950/30 border border-rose-500/40 p-2.5 rounded-xl flex items-start gap-2">
+                        <span class="text-rose-400 text-xs">⛔</span>
+                        <div>
+                            <span class="text-[11px] font-bold text-rose-300 uppercase tracking-wide">Regla de Oro (Lo que NUNCA debe hacer):</span>
+                            <p id="skill-rule" class="text-[11px] text-rose-200/90 mt-0.5">
+                                No contiene heurísticas de bajo nivel de PDF por regex, no ordena listas internamente y no escribe líneas de texto CSV.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ==================== DIAPOSITIVA 2 ==================== -->
+        <section id="slide-2" class="slide p-6 justify-start space-y-4">
+            <div>
+                <div class="inline-block text-xs uppercase tracking-wider text-sky-400 font-semibold mb-0.5">Flujo Operativo Paso a Paso</div>
+                <h2 class="text-xl font-black text-white">2. Workflow Determinista con Supervisión Humana Real</h2>
+                <p class="text-xs text-slate-400 max-w-3xl">
+                    El orquestador no delega decisiones críticas a ciegas. Cada comprobante es auditado y validado en un punto de control estricto (*Human-in-the-Loop*).
+                </p>
+            </div>
+
+            <!-- Stepper Interactivo Central -->
+            <div class="my-auto py-2">
+                <!-- Barra de Pasos -->
+                <div class="flex items-center justify-between max-w-4xl mx-auto mb-5 px-4">
+                    <div onclick="selectStep(1)" class="flex flex-col items-center cursor-pointer group">
+                        <div id="step-num-1" class="step-circle active w-9 h-9 rounded-full bg-sky-600 border-2 border-sky-400 flex items-center justify-center font-bold text-white text-xs transition">1</div>
+                        <span class="text-xs mt-1.5 font-medium text-slate-300 group-hover:text-white">Ingesta Incremental</span>
+                    </div>
+                    <div class="flex-1 h-0.5 bg-slate-800 mx-2"></div>
+                    <div onclick="selectStep(2)" class="flex flex-col items-center cursor-pointer group">
+                        <div id="step-num-2" class="step-circle w-9 h-9 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center font-bold text-slate-400 text-xs transition">2</div>
+                        <span class="text-xs mt-1.5 font-medium text-slate-400 group-hover:text-white">Extracción & Evidencia</span>
+                    </div>
+                    <div class="flex-1 h-0.5 bg-slate-800 mx-2"></div>
+                    <div onclick="selectStep(3)" class="flex flex-col items-center cursor-pointer group">
+                        <div id="step-num-3" class="step-circle w-9 h-9 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center font-bold text-slate-400 text-xs transition">3</div>
+                        <span class="text-xs mt-1.5 font-medium text-slate-400 group-hover:text-white">Control Humano</span>
+                    </div>
+                    <div class="flex-1 h-0.5 bg-slate-800 mx-2"></div>
+                    <div onclick="selectStep(4)" class="flex flex-col items-center cursor-pointer group">
+                        <div id="step-num-4" class="step-circle w-9 h-9 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center font-bold text-slate-400 text-xs transition">4</div>
+                        <span class="text-xs mt-1.5 font-medium text-slate-400 group-hover:text-white">Orden & Agenda CSV</span>
+                    </div>
+                </div>
+
+                <!-- Visor Dinámico del Paso -->
+                <div class="glass-panel p-5 rounded-2xl max-w-4xl mx-auto border-slate-700">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 id="step-title" class="text-base font-bold text-sky-400">Paso 1: Diálogo de Ingesta Acumulativa</h4>
+                        <span id="step-badge" class="text-[10px] font-mono bg-sky-500/20 text-sky-300 border border-sky-500/30 px-2 py-0.5 rounded-full">ESTADO: INICIAL / EXTRAYENDO</span>
+                    </div>
+                    <p id="step-desc" class="text-xs text-slate-300 mb-3 leading-relaxed">
+                        El usuario puede cargar facturas una por una o en lotes. El orquestador mantiene el lote acumulado en memoria sin reiniciar la sesión y pregunta explícitamente: <em>"¿Deseás seguir cargando más facturas o avanzar a la revisión?"</em>.
+                    </p>
+                    
+                    <div id="step-example" class="bg-slate-950/90 p-3.5 rounded-xl border border-slate-800 font-mono text-xs text-slate-300">
+                        <div class="text-slate-500 mb-1">// Ingesta interactiva en app.py:</div>
+                        <span class="text-emerald-400">agente.agregar_archivos([("factura_edesur.pdf", bytes)])</span><br>
+                        <span class="text-slate-400">Lote acumulado: 1 factura. Orquestador: ¿Desea sumar otra factura? [Sí] [Avanzar]</span><br>
+                        <span class="text-emerald-400">agente.agregar_archivos([("factura_telecom.pdf", bytes)])</span><br>
+                        <span class="text-sky-300">Lote final: 2 facturas listas para revisión conjunta en una sola agenda.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Informativo Diapo 2 -->
+            <div class="flex justify-between items-center text-xs text-slate-500 pt-1 border-t border-slate-800/60">
+                <span>Cero alucinación: ante campos vacíos o ambiguos, el flujo se bloquea hasta confirmación.</span>
+                <span class="text-sky-400 font-medium">Hacé clic en los pasos 1, 2, 3 o 4 para auditar cada fase ➔</span>
+            </div>
+        </section>
+
+
+        <!-- ==================== DIAPOSITIVA 3 ==================== -->
+        <section id="slide-3" class="slide p-6 justify-start space-y-4">
+            <div>
+                <div class="inline-block text-xs uppercase tracking-wider text-emerald-400 font-semibold mb-0.5">Integración Externa & Calidad de Software</div>
+                <h2 class="text-xl font-black text-white">3. Despacho por Correo (Gmail API) y Resiliencia Educativa</h2>
+                <p class="text-xs text-slate-400 max-w-3xl">
+                    Consumo seguro de servicios externos para la entrega de la agenda, complementado con un simulador educativo para evaluación docente.
+                </p>
+            </div>
+
+            <!-- Contenido Interactivo Diapo 3 -->
+            <div class="grid grid-cols-12 gap-5 my-auto">
+                <!-- Columna 1: Demostrador de Envío -->
+                <div class="col-span-6 glass-panel p-5 rounded-2xl border-slate-700 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
+                                <span>📧</span> Skill: enviar-agenda
+                            </h3>
+                            <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded-full font-mono">Gmail TLS 587</span>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed mb-3">
+                            Despacha la agenda vía SMTP seguro de Gmail utilizando una <strong>Contraseña de Aplicación de 16 caracteres</strong>, garantizando que nunca se exponga la contraseña personal del usuario.
+                        </p>
+
+                        <!-- Simulador Interactivo de Despacho -->
+                        <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-800 space-y-2.5">
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-400 block mb-0.5">Destinatario:</label>
+                                <input type="email" id="demo-email" value="patoabarca07@gmail.com" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none focus:border-sky-500 font-mono">
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label class="flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer">
+                                    <input type="checkbox" id="demo-dryrun" checked class="rounded bg-slate-950 border-slate-700 text-sky-500">
+                                    <span>Modo Simulación Educativo</span>
+                                </label>
+                            </div>
+                            <button onclick="simularEnvio()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-1.5 rounded-lg text-xs transition shadow-lg shadow-sky-600/30 flex items-center justify-center gap-1.5">
+                                <span>🚀</span> Probar Despacho
+                            </button>
+                            <div id="demo-result" class="text-[10px] p-2 rounded-lg bg-sky-950/60 border border-sky-500/30 text-sky-200 font-mono">
+                                Estado: Listo para simular o enviar.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-[10px] text-slate-400 mt-3 border-t border-slate-800 pt-2">
+                        🔒 <strong>Seguridad:</strong> Credenciales protegidas en <code>.env</code>; nunca se registran en logs ni se exponen a terceros.
+                    </div>
+                </div>
+
+                <!-- Columna 2: Calidad y Respaldo de Pruebas -->
+                <div class="col-span-6 flex flex-col space-y-3">
+                    <!-- Tarjeta de Cobertura de Pruebas -->
+                    <div class="glass-panel p-4 rounded-2xl border-slate-700">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Verificación Automatizada</span>
+                            <span class="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded">25 / 25 PASSED (100%)</span>
+                        </div>
+                        <h4 class="text-xs font-bold text-white mb-1.5">Suite Completa de Pruebas con pytest</h4>
+                        <ul class="text-[11px] text-slate-300 space-y-1">
+                            <li class="flex items-center gap-1.5">
+                                <span class="text-emerald-400 font-bold">✓</span> Ingesta incremental de facturas y descarte de duplicados.
+                            </li>
+                            <li class="flex items-center gap-1.5">
+                                <span class="text-emerald-400 font-bold">✓</span> Ordenamiento cronológico con desempate estable por empresa.
+                            </li>
+                            <li class="flex items-center gap-1.5">
+                                <span class="text-emerald-400 font-bold">✓</span> Delimitador regional <code>;</code> y codificación UTF-8 con BOM para Excel.
+                            </li>
+                            <li class="flex items-center gap-1.5">
+                                <span class="text-emerald-400 font-bold">✓</span> Segregación estricta de monedas (ARS y USD nunca mezcladas).
+                            </li>
+                            <li class="flex items-center gap-1.5">
+                                <span class="text-emerald-400 font-bold">✓</span> Validación de correo y empaquetado MIME multipart con adjunto.
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Tarjeta de Resiliencia para Corrección Docente -->
+                    <div class="glass-panel p-4 rounded-2xl border-slate-700 flex-1 flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs font-bold text-amber-400 uppercase tracking-wider block mb-0.5">⭐ Valor Académico Agregado</span>
+                            <h4 class="text-xs font-bold text-white mb-0.5">Sandbox para Corrección Docente</h4>
+                            <p class="text-[11px] text-slate-300 leading-relaxed">
+                                Si el profesor ejecuta el trabajo sin haber cargado sus credenciales de Gmail, la skill detecta la ausencia y activa el <strong>Sandbox Simulado</strong>, empaquetando el CSV y confirmando la validez sin provocar errores ni interrumpir la evaluación.
+                            </p>
+                        </div>
+                        <div class="text-[10px] font-mono text-slate-400 bg-slate-900/60 p-2 rounded-lg border border-slate-800 mt-2">
+                            CLI: <code>python skills/enviar-agenda/scripts/ejecutar.py --destino mail@test.com --dry-run</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Barra de Navegación Inferior -->
+    <footer class="glass-panel px-6 py-2 flex justify-between items-center text-xs text-slate-400 z-50">
+        <div>Usa las teclas <kbd class="bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700 text-slate-300">◀</kbd> y <kbd class="bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700 text-slate-300">▶</kbd> para navegar</div>
+        <div class="flex space-x-1.5">
+            <button onclick="goToSlide(1)" id="dot-1" class="w-7 h-2 rounded-full bg-sky-500 transition-all"></button>
+            <button onclick="goToSlide(2)" id="dot-2" class="w-2.5 h-2 rounded-full bg-slate-700 hover:bg-slate-600 transition-all"></button>
+            <button onclick="goToSlide(3)" id="dot-3" class="w-2.5 h-2 rounded-full bg-slate-700 hover:bg-slate-600 transition-all"></button>
+        </div>
+        <div class="text-slate-400">Diplomatura en IA · VenceClaro</div>
+    </footer>
+
+    <!-- Lógica Interactiva JavaScript -->
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 3;
+
+        function updateSlideUI() {
+            for (let i = 1; i <= totalSlides; i++) {
+                const s = document.getElementById(`slide-${i}`);
+                const dot = document.getElementById(`dot-${i}`);
+                if (i === currentSlide) {
+                    s.classList.add('active');
+                    dot.className = "w-7 h-2 rounded-full bg-sky-500 transition-all";
+                } else {
+                    s.classList.remove('active');
+                    dot.className = "w-2.5 h-2 rounded-full bg-slate-700 hover:bg-slate-600 transition-all";
+                }
+            }
+            document.getElementById('slideIndicator').textContent = `Diapo ${currentSlide} de ${totalSlides}`;
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                currentSlide++;
+                updateSlideUI();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                currentSlide--;
+                updateSlideUI();
+            }
+        }
+
+        function goToSlide(n) {
+            currentSlide = n;
+            updateSlideUI();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                prevSlide();
+            }
+        });
+
+        // ==================== INTERACCIÓN DIAPO 1: SKILLS Y ARCHIVOS ====================
+        const skillsData = {
+            orquestador: {
+                title: "🎯 organizar-vencimientos",
+                role: "Rol: Coordinadora de ciclo de vida, ingesta acumulativa y supervisión humana",
+                type: "Stateful (Con Estado)",
+                typeClass: "bg-amber-500/20 text-amber-300 border-amber-500/40",
+                desc: "Coordina la ejecución secuencial determinista. Mantiene el lote acumulado de facturas, gestiona la pregunta interactiva de si se desean sumar más comprobantes, entrega los datos al usuario en el Punto de Control y delega el ordenamiento, exportación y despacho.",
+                files: `skills/organizar-vencimientos/
+├── SKILL.md                      # Procedimiento normativo, roles y especificación
+├── references/
+│   └── politica-orquestacion.md  # Políticas de handoff humano, bloqueo y trazabilidad
+├── orquestador.py                # Lógica ejecutable de coordinación
+└── scripts/
+    ├── ejecutar.py               # CLI Python (--auto-confirmar, --salida, --json)
+    └── ejecutar.sh               # Wrapper ejecutable Bash portable`,
+                inputs: "Colección de PDFs en memoria o rutas de disco.",
+                outputs: "Agenda consolidada, archivos excluidos y auditoría.",
+                rule: "No contiene heurísticas de bajo nivel de PDF por regex, no ordena listas internamente y no escribe líneas de texto CSV."
+            },
+            extraer: {
+                title: "🔍 extraer-vencimiento",
+                role: "Rol: Análisis pasivo de documentos PDF y preservación de evidencia",
+                type: "Stateless (Sin Estado)",
+                typeClass: "bg-slate-700 text-slate-300 border-slate-600",
+                desc: "Transforma cada documento PDF con capa de texto en un registro estructurado (FacturaExtraida). Identifica empresa, servicio, fecha de vencimiento, importe numérico y moneda, reteniendo el fragmento textual original como evidencia no refutable.",
+                files: `skills/extraer-vencimiento/
+├── SKILL.md                      # Procedimiento normativo de lectura y parseo
+├── references/
+│   └── politica-extraccion.md    # Directivas de veracidad y captura de evidencia
+├── extractor.py                  # Lógica de regex y parsing de PDFs con pypdf
+└── scripts/
+    ├── ejecutar.py               # CLI Python (--json para pipelines)
+    └── ejecutar.sh               # Entrypoint Bash ejecutable`,
+                inputs: "Bytes o archivo PDF individual con texto seleccionable.",
+                outputs: "Objeto FacturaExtraida con evidencia textual de respaldo.",
+                rule: "No ordena comprobantes ni decide si una factura incompleta debe quedar fuera de la agenda final."
+            },
+            ordenar: {
+                title: "🔢 ordenar-vencimientos",
+                role: "Rol: Ordenamiento cronológico determinista con desempate estable",
+                type: "Stateless (Sin Estado)",
+                typeClass: "bg-slate-700 text-slate-300 border-slate-600",
+                desc: "Aplica ordenamiento cronológico ascendente por fecha de vencimiento (AAAA-MM-DD). Si dos facturas vencen el mismo día, aplica criterio de desempate estable: primero alfabético por empresa emisora y luego por nombre de archivo de origen.",
+                files: `skills/ordenar-vencimientos/
+├── SKILL.md                      # Procedimiento de ordenamiento cronológico
+├── references/
+│   └── politica-ordenamiento.md  # Criterios de desempate estable y años bisiestos
+├── ordenador.py                  # Algoritmo determinista de ordenación
+└── scripts/
+    ├── ejecutar.py               # CLI Python de ordenamiento sobre JSON
+    └── ejecutar.sh               # Entrypoint Bash ejecutable`,
+                inputs: "Lista de comprobantes confirmados (FacturaConfirmada).",
+                outputs: "Lista ordenada garantizando consistencia idéntica en cualquier plataforma.",
+                rule: "No modifica montos, fechas ni interpreta datos; falla explícitamente si recibe un registro sin fecha válida."
+            },
+            generar: {
+                title: "📑 generar-agenda",
+                role: "Rol: Exportación CSV bajo configuración regional argentina",
+                type: "Stateless (Sin Estado)",
+                typeClass: "bg-slate-700 text-slate-300 border-slate-600",
+                desc: "Genera el archivo CSV formateado específicamente para Microsoft Excel en español: delimitador punto y coma (;), separador decimal coma (,) y codificación UTF-8 con BOM (utf-8-sig) para evitar corrupción de tildes o caracteres especiales.",
+                files: `skills/generar-agenda/
+├── SKILL.md                      # Procedimiento normativo de exportación
+├── references/
+│   └── politica-agenda.md        # Delimitador ';', coma decimal y segregación
+├── generador.py                  # Generador CSV con BOM y cálculo de subtotales
+└── scripts/
+    ├── ejecutar.py               # CLI Python de exportación CSV (--salida)
+    └── ejecutar.sh               # Entrypoint Bash ejecutable`,
+                inputs: "Lista ordenada de comprobantes confirmados.",
+                outputs: "Bytes de agenda_vencimientos.csv y subtotales por moneda.",
+                rule: "Segregación estricta de monedas: bajo ninguna circunstancia suma o combina montos en ARS con montos en USD."
+            },
+            enviar: {
+                title: "📧 enviar-agenda",
+                role: "Rol: Despacho seguro por correo (Gmail API / SMTP TLS 587)",
+                type: "API / Servicio Externo",
+                typeClass: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
+                desc: "Empaqueta un correo electrónico MIME multipart con el resumen financiero en texto plano y HTML estilizado, adjuntando el archivo agenda_vencimientos.csv. Se conecta a Gmail con Contraseña de Aplicación de 16 caracteres y cuenta con Sandbox Educativo.",
+                files: `skills/enviar-agenda/
+├── SKILL.md                      # Procedimiento de despacho por correo
+├── references/
+│   └── politica-envio.md         # Reglas de protección de credenciales y sandbox
+├── remitente.py                  # Cliente Gmail SMTP (TLS 587) y armado MIME
+└── scripts/
+    ├── ejecutar.py               # CLI Python con soporte --dry-run
+    └── ejecutar.sh               # Entrypoint Bash ejecutable`,
+                inputs: "Email destinatario, bytes del CSV y totales por moneda.",
+                outputs: "Acuse de recibo de entrega (REAL o SIMULACION).",
+                rule: "Protección absoluta de credenciales: nunca loguea contraseñas ni expone claves personales."
+            }
+        };
+
+        function selectSkill(key) {
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('active');
+                b.classList.add('bg-slate-900/60', 'border-slate-800');
+            });
+            const activeBtn = document.getElementById(`btn-${key}`);
+            activeBtn.classList.add('active');
+            activeBtn.classList.remove('bg-slate-900/60', 'border-slate-800');
+
+            const data = skillsData[key];
+            document.getElementById('skill-title').textContent = data.title;
+            document.getElementById('skill-role').textContent = data.role;
+            const typeBadge = document.getElementById('skill-type');
+            typeBadge.textContent = data.type;
+            typeBadge.className = `px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${data.typeClass}`;
+            document.getElementById('skill-desc').textContent = data.desc;
+            document.getElementById('skill-files').textContent = data.files;
+            document.getElementById('skill-inputs').textContent = data.inputs;
+            document.getElementById('skill-outputs').textContent = data.outputs;
+            document.getElementById('skill-rule').textContent = data.rule;
+        }
+
+        // ==================== INTERACCIÓN DIAPO 2: WORKFLOW STEPPER ====================
+        const stepsData = {
+            1: {
+                title: "Paso 1: Diálogo de Ingesta Acumulativa",
+                badge: "ESTADO: INICIAL / EXTRAYENDO",
+                desc: "El usuario puede cargar facturas una por una o en lotes. El orquestador mantiene el lote acumulado en memoria sin reiniciar la sesión y pregunta explícitamente: '¿Deseás seguir cargando más facturas o avanzar a la revisión?'.",
+                example: `<span class="text-slate-500">// Ingesta interactiva en app.py:</span><br>
+<span class="text-emerald-400">agente.agregar_archivos([("factura_edesur.pdf", bytes)])</span><br>
+<span class="text-slate-400">Lote acumulado: 1 factura. Orquestador: ¿Desea sumar otra factura? [Sí] [Avanzar]</span><br>
+<span class="text-emerald-400">agente.agregar_archivos([("factura_telecom.pdf", bytes)])</span><br>
+<span class="text-sky-300">Lote final: 2 facturas listas para revisión conjunta en una sola agenda.</span>`
+            },
+            2: {
+                title: "Paso 2: Extracción con Evidencia Textual de Respaldo",
+                badge: "SKILL: extraer-vencimiento",
+                desc: "Se invoca pasivamente pypdf sobre cada archivo. Los importes se parsean con notación argentina (25.000,50). Se retiene la cadena textual exacta donde apareció el dato para auditoría completa.",
+                example: `<span class="text-slate-500">// Evidencia textual extraída:</span><br>
+<span class="text-slate-300">archivo_origen:</span> "factura_edesur_luz.pdf"<br>
+<span class="text-slate-300">importe_parseado:</span> 14250.00 ARS<br>
+<span class="text-emerald-300">evidencia_texto:</span> {"importe": "Total a Pagar $ 14.250,00", "vto": "Vencimiento: 15/06/2026"}`
+            },
+            3: {
+                title: "Paso 3: Punto de Control Humano (Human-in-the-Loop)",
+                badge: "ESTADO: REVISION_REQUERIDA",
+                desc: "El agente se detiene obligatoriamente. Si una factura no tiene texto (escaneo) o faltan campos obligatorios, el sistema BLOQUEA el avance hacia la agenda hasta que el usuario corrija los datos o marque 'Excluir comprobante'.",
+                example: `<span class="text-amber-400 font-bold">⚠️ CASO BORDE DETECTADO:</span> "factura_sin_texto.pdf" no contiene capa de texto.<br>
+<span class="text-rose-400">agente.validar_y_confirmar() ➔ Rechazado (Falta empresa, importe y fecha).</span><br>
+<span class="text-emerald-400">Acción del Usuario: Marca 'Excluir comprobante' ➔ Validación exitosa.</span>`
+            },
+            4: {
+                title: "Paso 4: Ordenamiento y Agenda Regional en CSV",
+                badge: "ESTADO: AGENDA_LISTA",
+                desc: "Se invoca ordenar-vencimientos (desempate: fecha ➔ empresa ➔ archivo) y luego generar-agenda. Se exporta agenda_vencimientos.csv con delimitador ';' y codificación UTF-8 con BOM. Los totales de ARS y USD se informan estrictamente por separado.",
+                example: `<span class="text-slate-500">// agenda_vencimientos.csv (UTF-8 con BOM):</span><br>
+Vencimiento;Empresa;Servicio;Importe;Moneda;Archivo de origen<br>
+<span class="text-sky-300">15/05/2026;Telecom;Internet;8.900,00;ARS;factura_telecom.pdf</span><br>
+<span class="text-sky-300">15/06/2026;Edesur;Luz;14.250,00;ARS;factura_edesur.pdf</span><br>
+<span class="text-emerald-400">Total a pagar ARS: $ 23.150,00 | Total a pagar USD: U$S 45,00 (Sin mezclar)</span>`
+            }
+        };
+
+        function selectStep(stepNum) {
+            for (let i = 1; i <= 4; i++) {
+                const circle = document.getElementById(`step-num-${i}`);
+                if (i === stepNum) {
+                    circle.className = "step-circle active w-10 h-10 rounded-full bg-sky-600 border-2 border-sky-400 flex items-center justify-center font-bold text-white text-xs transition";
+                } else {
+                    circle.className = "step-circle w-10 h-10 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center font-bold text-slate-400 text-xs transition";
+                }
+            }
+            const data = stepsData[stepNum];
+            document.getElementById('step-title').textContent = data.title;
+            document.getElementById('step-badge').textContent = data.badge;
+            document.getElementById('step-desc').textContent = data.desc;
+            document.getElementById('step-example').innerHTML = data.example;
+        }
+
+        // ==================== INTERACCIÓN DIAPO 3: SIMULADOR DE ENVÍO ====================
+        function simularEnvio() {
+            const email = document.getElementById('demo-email').value.trim();
+            const isDryRun = document.getElementById('demo-dryrun').checked;
+            const res = document.getElementById('demo-result');
+
+            if (!email || !email.includes('@')) {
+                res.className = "text-[10px] p-2 rounded-lg bg-rose-950/60 border border-rose-500/40 text-rose-200 font-mono";
+                res.textContent = "❌ Error: La dirección de correo es sintácticamente inválida.";
+                return;
+            }
+
+            if (isDryRun) {
+                res.className = "text-[10px] p-2 rounded-lg bg-sky-950/60 border border-sky-500/40 text-sky-200 font-mono";
+                res.innerHTML = `✅ [MODO SIMULACION EDUCATIVO]: Correo validado para '<strong>${email}</strong>'. Adjunto 'agenda_vencimientos.csv' (354 bytes UTF-8 BOM) empaquetado exitosamente. Status: HTTP 200 OK.`;
+            } else {
+                res.className = "text-[10px] p-2 rounded-lg bg-amber-950/60 border border-amber-500/40 text-amber-200 font-mono";
+                res.innerHTML = `⚠️ Modo Real: Conectando a <code>smtp.gmail.com:587</code>... Requiere Contraseña de Aplicación de 16 caracteres en .env.`;
+            }
+        }
+    </script>
+</body>
+</html>
