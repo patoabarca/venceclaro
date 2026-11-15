@@ -13,7 +13,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
-from core.llm import ClienteAnthropic, ClienteLLM, ClienteLLMFalso, LlamadaHerramienta, RespuestaLLM
+from core.llm import ClienteAnthropic, ClienteGemini, ClienteLLM, ClienteLLMFalso, LlamadaHerramienta, RespuestaLLM
 from core.models import (
     EstadoProceso,
     FacturaConfirmada,
@@ -84,16 +84,45 @@ class OrquestadorVencimientos:
         # Configuración de LLM
         self.usar_llm = usar_llm
         self.cliente_llm: Optional[ClienteLLM] = cliente_llm
+        self.proveedor_llm: str = os.getenv("LLM_PROVIDER", "gemini").lower().strip()
+        self.error_llm: Optional[str] = None
 
         if self.usar_llm and self.cliente_llm is None:
-            api_key = os.getenv("ANTHROPIC_API_KEY", "").strip()
-            if api_key:
-                try:
-                    self.cliente_llm = ClienteAnthropic(api_key=api_key)
-                except Exception as e:
-                    self.mensajes_estado.append(f"Aviso: No se pudo inicializar Anthropic ({e}). Modo determinista activo.")
+            if self.proveedor_llm == "gemini":
+                api_key = os.getenv("GEMINI_API_KEY", "").strip()
+                if api_key:
+                    try:
+                        self.cliente_llm = ClienteGemini(api_key=api_key)
+                    except Exception as e:
+                        self.error_llm = f"Aviso: No se pudo inicializar Google Gemini ({e}). Modo determinista activo."
+                        self.mensajes_estado.append(self.error_llm)
+                        self.usar_llm = False
+                else:
+                    self.error_llm = (
+                        "Aviso: No se configuró GEMINI_API_KEY en .env "
+                        "(obtenela gratis en https://aistudio.google.com/apikey). Modo determinista activo."
+                    )
+                    self.mensajes_estado.append(self.error_llm)
+                    self.usar_llm = False
+            elif self.proveedor_llm == "anthropic":
+                api_key = os.getenv("ANTHROPIC_API_KEY", "").strip()
+                if api_key:
+                    try:
+                        self.cliente_llm = ClienteAnthropic(api_key=api_key)
+                    except Exception as e:
+                        self.error_llm = f"Aviso: No se pudo inicializar Anthropic ({e}). Modo determinista activo."
+                        self.mensajes_estado.append(self.error_llm)
+                        self.usar_llm = False
+                else:
+                    self.error_llm = "Aviso: No se configuró ANTHROPIC_API_KEY en .env. Modo determinista activo."
+                    self.mensajes_estado.append(self.error_llm)
                     self.usar_llm = False
             else:
+                self.error_llm = (
+                    f"Aviso: Proveedor de LLM desconocido '{self.proveedor_llm}'. "
+                    "Configure LLM_PROVIDER=gemini en .env. Modo determinista activo."
+                )
+                self.mensajes_estado.append(self.error_llm)
                 self.usar_llm = False
 
     def reiniciar(self) -> None:
