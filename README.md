@@ -127,8 +127,7 @@ venceclaro/
 │   │   ├── references/
 │   │   │   └── politica-orquestacion.md # Políticas operativas ORQ-1 a ORQ-7
 │   │   └── scripts/
-│   │       ├── ejecutar.py        # CLI principal (--salida, --auto-confirmar, --enviar-a, --sin-llm)
-│   │       └── ejecutar.sh        # Wrapper Bash ejecutable
+│   │       └── ejecutar.py        # CLI principal (--salida, --auto-confirmar, --enviar-a, --sin-llm)
 │   ├── extraer-vencimiento/       # Skill Especializada: Extracción de texto y datos
 │   │   ├── SKILL.md               # Especificación normativa y esquema de entrada
 │   │   ├── extractor.py           # Parseo de PDF con pypdf y preservación de evidencia
@@ -153,8 +152,7 @@ venceclaro/
 │       ├── references/
 │       │   └── politica-envio.md  # Políticas operativas ENV-1 a ENV-7
 │       └── scripts/
-│           ├── ejecutar.py        # CLI con soporte --dry-run y credenciales directas
-│           └── ejecutar.sh
+│           └── ejecutar.py        # CLI con soporte --dry-run y credenciales directas
 ├── tests/                         # Suite de pruebas automatizadas (78 tests)
 │   ├── test_politicas.py          # 32 tests de reglas normativas + 2 tests meta
 │   ├── test_orquestador.py        # Pruebas de integración, LLM mockeado y guardas
@@ -172,7 +170,7 @@ venceclaro/
 Cada carpeta en `skills/<nombre>/` cuenta con:
 - `SKILL.md`: Contrato formal con metadatos YAML frontmatter (`name`, `description`), especificación de entradas/salidas y directivas de diseño.
 - `references/`: Políticas operativas normativas en Markdown con identificadores de regla verificables por tests.
-- `scripts/`: Puntos de entrada para terminal/CLI (`ejecutar.py` con argumentos estandarizados y `ejecutar.sh` para entornos Unix).
+- `scripts/`: Puntos de entrada para terminal/CLI (`ejecutar.py` con argumentos estandarizados).
 - Módulo Python (`<nombre>.py`): Lógica ejecutable que expone la función de contrato `invocar(entrada: dict) -> dict` y el diccionario descriptivo `ESQUEMA_ENTRADA`.
 
 ---
@@ -249,8 +247,6 @@ Permite:
 - Despachar el correo electrónico a un destinatario elegido (en modo real con SMTP o en modo simulación).
 
 ### 8.2. Terminal / CLI (Skill Orquestadora)
-
-#### En Windows (PowerShell / CMD) con Python:
 - **Flujo completo con autoconfirmación y salida CSV:**
   ```bash
   python skills/organizar-vencimientos/scripts/ejecutar.py ejemplos/factura_edesur_luz.pdf ejemplos/factura_telecom_internet.pdf --salida agenda.csv --auto-confirmar
@@ -267,12 +263,6 @@ Permite:
   ```bash
   python skills/organizar-vencimientos/scripts/ejecutar.py ejemplos/factura_edesur_luz.pdf --salida agenda.csv --auto-confirmar --sin-llm
   ```
-
-#### En entornos Bash (Linux, macOS, Git Bash o WSL):
-Los scripts `.sh` tienen formato de fin de línea Unix (LF) y delegan en el CLI:
-```bash
-bash skills/organizar-vencimientos/scripts/ejecutar.sh ejemplos/factura_edesur_luz.pdf --salida agenda.csv --auto-confirmar --dry-run
-```
 
 ### 8.3. CLI de Skills Individuales
 Cada skill especializada puede ejecutarse de forma atómica e independiente:

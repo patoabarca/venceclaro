@@ -32,7 +32,6 @@ Procesar un documento PDF de factura de servicios y extraer un registro de datos
 - [politica-extraccion.md](references/politica-extraccion.md): Reglas de no invención de datos, formato argentino y tratamiento pasivo de documentos.
 
 ## Ejecutable
-- Bash: `scripts/ejecutar.sh <ruta_factura.pdf> [--json]`
 - Python: `python scripts/ejecutar.py <ruta_factura.pdf> [--json]`
 
 ## Salida de `invocar`

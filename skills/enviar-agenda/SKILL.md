@@ -37,7 +37,6 @@ Despachar de forma segura y automatizada la agenda consolidada de vencimientos h
 - [politica-envio.md](references/politica-envio.md): Directivas de seguridad, protección de contraseñas de app, autorización y modo sandbox.
 
 ## Ejecutable
-- Bash: `scripts/ejecutar.sh --destino <correo> [--csv <archivo.csv>] [--dry-run]`
 - Python: `python scripts/ejecutar.py --destino <correo> [--csv <archivo.csv>] [--dry-run]`
 
 ## Salida de `invocar`

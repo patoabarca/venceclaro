@@ -43,7 +43,6 @@ Gestionar el ciclo de vida completo de organización de vencimientos de facturas
 - [politica-orquestacion.md](references/politica-orquestacion.md): Directivas de coordinación, bucle de agente LLM, guardas de seguridad y modo determinista.
 
 ## Ejecutable
-- Bash: `scripts/ejecutar.sh <facturas.pdf...> [--salida agenda.csv] [--auto-confirmar] [--enviar-a <correo>] [--dry-run] [--sin-llm] [--json]`
 - Python: `python scripts/ejecutar.py <facturas.pdf...> [--salida agenda.csv] [--auto-confirmar] [--enviar-a <correo>] [--dry-run] [--sin-llm] [--json]`
 
 ## Salida de `invocar`

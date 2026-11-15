@@ -32,7 +32,6 @@ Exportar la lista ordenada de comprobantes confirmados a un archivo CSV estructu
 - [politica-agenda.md](references/politica-agenda.md): Formato de columnas, directivas de codificación para Excel y prohibición de mezcla de monedas.
 
 ## Ejecutable
-- Bash: `scripts/ejecutar.sh <registros_ordenados.json> [--salida <agenda.csv>]`
 - Python: `python scripts/ejecutar.py <registros_ordenados.json> [--salida <agenda.csv>]`
 
 ## Salida de `invocar`

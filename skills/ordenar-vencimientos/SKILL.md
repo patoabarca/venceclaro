@@ -26,7 +26,6 @@ Tomar una lista de registros de facturas debidamente validados y ordenarlos cron
 - [politica-ordenamiento.md](references/politica-ordenamiento.md): Criterios de desempate, soporte multianual y garantía de no modificación de datos.
 
 ## Ejecutable
-- Bash: `scripts/ejecutar.sh <registros_confirmados.json> [--json]`
 - Python: `python scripts/ejecutar.py <registros_confirmados.json> [--json]`
 
 ## Salida de `invocar`

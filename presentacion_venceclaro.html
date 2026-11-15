@@ -243,8 +243,7 @@
 │   └── politica-orquestacion.md  # Políticas normativas [ORQ-1] a [ORQ-7]
 ├── orquestador.py                # Lógica ejecutable: OrquestadorVencimientos
 └── scripts/
-    ├── ejecutar.py               # CLI principal (--salida, --auto-confirmar, --sin-llm)
-    └── ejecutar.sh               # Wrapper ejecutable Bash portable</pre>
+    └── ejecutar.py               # CLI principal (--salida, --auto-confirmar, --sin-llm)</pre>
                         </div>
 
                         <div class="grid grid-cols-2 gap-2 text-xs">
@@ -608,8 +607,7 @@
 │   └── politica-orquestacion.md  # Políticas normativas [ORQ-1] a [ORQ-7]
 ├── orquestador.py                # Lógica ejecutable: OrquestadorVencimientos
 └── scripts/
-    ├── ejecutar.py               # CLI principal (--salida, --auto-confirmar, --sin-llm)
-    └── ejecutar.sh               # Wrapper ejecutable Bash portable`,
+    └── ejecutar.py               # CLI principal (--salida, --auto-confirmar, --sin-llm)`,
                 inputs: "Colección de tuplas (nombre, bytes/ruta) y opciones de confirmación.",
                 outputs: "Agenda consolidada, traza de pasos PasoTraza, resumen y acuse de envío.",
                 rule: "No contiene heurísticas de bajo nivel de PDF, no ordena listas directamente en memoria y no genera líneas de texto CSV a mano."
@@ -626,8 +624,7 @@
 │   └── politica-extraccion.md    # Directivas de veracidad [EXT-1] a [EXT-8]
 ├── extractor.py                  # Lógica de regex y parsing de PDFs con pypdf
 └── scripts/
-    ├── ejecutar.py               # CLI Python (--json para pipelines)
-    └── ejecutar.sh               # Entrypoint Bash ejecutable`,
+    └── ejecutar.py               # CLI Python (--json para pipelines)`,
                 inputs: "Bytes o archivo PDF individual con texto seleccionable.",
                 outputs: "Objeto FacturaExtraida con evidencia textual de respaldo.",
                 rule: "Rechaza nombres fuera de _archivos_en_memoria (anti path-traversal); nunca decide si un comprobante incompleto se excluye."
@@ -644,8 +641,7 @@
 │   └── politica-ordenamiento.md  # Criterios de desempate estable [ORD-1] a [ORD-4]
 ├── ordenador.py                  # Algoritmo determinista de ordenación
 └── scripts/
-    ├── ejecutar.py               # CLI Python de ordenamiento sobre JSON
-    └── ejecutar.sh               # Entrypoint Bash ejecutable`,
+    └── ejecutar.py               # CLI Python de ordenamiento sobre JSON`,
                 inputs: "Lista de comprobantes confirmados (FacturaConfirmada).",
                 outputs: "Lista ordenada garantizando consistencia idéntica en cualquier plataforma.",
                 rule: "Inmutabilidad total: no modifica importes, fechas ni campos; falla explícitamente si recibe un registro sin fecha válida."
@@ -662,8 +658,7 @@
 │   └── politica-agenda.md        # Formato regional y segregación [AGE-1] a [AGE-6]
 ├── generador.py                  # Generador CSV con write_bytes y totales por moneda
 └── scripts/
-    ├── ejecutar.py               # CLI Python de exportación CSV (--salida)
-    └── ejecutar.sh               # Entrypoint Bash ejecutable`,
+    └── ejecutar.py               # CLI Python de exportación CSV (--salida)`,
                 inputs: "Lista ordenada de comprobantes confirmados.",
                 outputs: "Bytes de agenda_vencimientos.csv y subtotales segregados por moneda.",
                 rule: "Segregación estricta de divisas: bajo ninguna circunstancia suma o combina montos en ARS con montos en USD."
@@ -680,8 +675,7 @@
 │   └── politica-envio.md         # Reglas de protección de credenciales [ENV-1] a [ENV-7]
 ├── remitente.py                  # Cliente Gmail SMTP (puerto 587 STARTTLS) y MIME
 └── scripts/
-    ├── ejecutar.py               # CLI Python con soporte --dry-run
-    └── ejecutar.sh               # Entrypoint Bash ejecutable`,
+    └── ejecutar.py               # CLI Python con soporte --dry-run`,
                 inputs: "Email destinatario, bytes del CSV y totales por moneda.",
                 outputs: "Acuse de recibo de entrega (REAL o SIMULACION).",
                 rule: "No se expone al LLM: credenciales protegidas desde variables de entorno; nunca loguea contraseñas ni expone claves personales."
