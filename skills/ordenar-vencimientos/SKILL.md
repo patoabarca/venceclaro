@@ -8,8 +8,8 @@ description: Ordena cronológicamente registros confirmados de facturas por fech
 ## Objetivo
 Tomar una lista de registros de facturas debidamente validados y ordenarlos cronológicamente por fecha de vencimiento ascendente de manera estable y determinista, sin alterar datos ni completar campos omitidos.
 
-## Entradas
-- **registros**: Lista de objetos `FacturaConfirmada` o diccionarios equivalentes con campos validados (`fecha_vencimiento`, `empresa`, `archivo_origen`).
+## Entradas (`invocar(entrada: dict) -> dict`)
+- **registros**: Lista de objetos `FacturaConfirmada`, `RegistroRevision` o diccionarios con campos validados (`fecha_vencimiento`, `empresa`, `archivo_origen`).
 
 ## Pasos de Ejecución
 1. **Validación de integridad**:
@@ -23,14 +23,16 @@ Tomar una lista de registros de facturas debidamente validados y ordenarlos cron
    Generar una nueva lista ordenada sin mutar los atributos de los objetos originales ni recalcular importes.
 
 ## Referencias a Consultar
-- [politica-ordenamiento.md](file:///c:/Users/Asus/Documents/Diplomatura%20IA/venceclaro/skills/ordenar-vencimientos/references/politica-ordenamiento.md): Criterios de desempate, soporte multianual y garantía de no modificación de datos.
+- [politica-ordenamiento.md](references/politica-ordenamiento.md): Criterios de desempate, soporte multianual y garantía de no modificación de datos.
 
 ## Ejecutable
 - Bash: `scripts/ejecutar.sh <registros_confirmados.json> [--json]`
 - Python: `python scripts/ejecutar.py <registros_confirmados.json> [--json]`
 
-## Salida
-Lista de registros ordenados manteniendo la estructura `FacturaConfirmada`.
+## Salida de `invocar`
+Diccionario con:
+- `registros`: Lista de diccionarios ordenados.
+- `objetos`: Lista de objetos `FacturaConfirmada` ordenados.
 
 ## Manejo de Errores
 - **Registro con fecha nula**: La ejecución se interrumpe y se informa la excepción correspondiente para evitar agendas con fechas indefinidas.

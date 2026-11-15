@@ -16,7 +16,7 @@ for p in [str(SKILL_DIR), str(BASE_DIR)]:
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from extractor import extraer_datos_factura
+from extractor import invocar
 
 
 def main():
@@ -46,8 +46,8 @@ def main():
             continue
 
         try:
-            extraida = extraer_datos_factura(ruta, ruta.name)
-            resultados.append(extraida.a_diccionario())
+            res = invocar({"archivo": str(ruta)})
+            resultados.append(res["registro"])
         except Exception as e:
             print(f"[ERROR] Falló extracción de {ruta.name}: {e}", file=sys.stderr)
             hay_error_fatal = True

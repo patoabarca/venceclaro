@@ -1,25 +1,20 @@
-# Política de Envío y Despacho de Agenda por Correo
+# Política de Envío de Agenda y Seguridad
 
-## 1. Principio de Responsabilidad Delimitada
-- La skill `enviar-agenda` tiene como única función técnica empaquetar y despachar la agenda de vencimientos vía correo electrónico (protocolo SMTP seguro sobre Gmail / API de correo).
-- No altera los importes, fechas ni contenidos del archivo CSV provisto.
-- No reemplaza la descarga local en la interfaz; actúa como canal de entrega complementario.
+## 1. Principio de No Emisión Inadvertida
+- Ningún correo electrónico debe ser transmitido sin la voluntad y autorización explícita del usuario.
+- El destinatario debe ser provisto directamente por el usuario (mediante el campo en la interfaz o el argumento `--enviar-a` en el CLI). Está terminantemente prohibido que un modelo de lenguaje o un documento PDF defina o altere el destinatario.
 
-## 2. Protección Estricta de Credenciales y Privacidad
-- Está terminantemente prohibido imprimir o persistir en registros de logs o trazas de auditoría la contraseña de aplicación de Gmail (*App Password*).
-- Las credenciales se obtienen prioritariamente de variables de entorno (`GMAIL_REMITENTE`, `GMAIL_APP_PASSWORD`), del archivo `.env` o del formulario protegido en memoria de la sesión.
-- En caso de error de autenticación, el mensaje informativo debe orientar al usuario sobre cómo generar su contraseña de 16 caracteres en Google sin exponer información interna.
+## 2. Gestión de Credenciales y Secretos
+- Las credenciales de Gmail (`GMAIL_REMITENTE` y `GMAIL_APP_PASSWORD`) deben administrarse exclusivamente mediante variables de entorno en el archivo `.env`.
+- La contraseña de aplicación debe ser la clave de 16 caracteres generada en la configuración de seguridad de Google.
+- **Regla de Confidencialidad Absoluta:** Bajo ninguna circunstancia la contraseña debe registrarse en logs, imprimirse en consola, incluirse en excepciones ni pasarse como contexto a ningún modelo de lenguaje.
 
-## 3. Integridad del Correo y Adjunto
-- **Asunto estandarizado**: `📅 Agenda de Vencimientos - VenceClaro`
-- **Cuerpo estructurado (Multipart Texto y HTML)**:
-  - Incluye tabla sintética de comprobantes con sus fechas de vencimiento.
-  - Informa los subtotales desagregados estrictamente por moneda (ARS / USD).
-- **Archivo adjunto**:
-  - Nombre: `agenda_vencimientos.csv`.
-  - Tipo MIME: `text/csv`.
-  - Codificación preservada: UTF-8 con BOM (`utf-8-sig`) para compatibilidad directa con Microsoft Excel en la máquina del destinatario.
+## 3. Modo Simulación Educativo (*Dry-Run*)
+- Para pruebas automatizadas, demostraciones o revisiones sin impacto externo, se debe utilizar el parámetro `dry_run=True`.
+- En modo simulación, la skill valida la sintaxis del correo, empaqueta el mensaje con el archivo adjunto `agenda_vencimientos.csv` y devuelve éxito sin entablar conexión de red con los servidores de Google.
+- Si no se suministraron credenciales y no se solicitó expresamente `dry_run=True`, la skill debe rechazar la operación con un error explícito; **no debe caer silenciosamente a modo simulación**.
 
-## 4. Validación de Dirección y Modo Sandbox Educativo
-- Antes de iniciar la conexión de red, la dirección del destinatario debe validarse bajo formato RFC 5322.
-- **Modo Sandbox / Simulación Educativa**: Si el entorno de ejecución no dispone de credenciales de Gmail cargadas (por ejemplo, durante la evaluación docente o pruebas locales rápidas), la skill valida el empaquetado del mensaje y simula el despacho exitoso devolviendo un identificador simbólico `SIM-GMAIL-OK`, evitando bloqueos en la demostración académica.
+## 4. Integridad del Mensaje
+- El correo debe despacharse mediante `smtp.gmail.com:587` con cifrado `STARTTLS`.
+- El mensaje debe contener formato multipart (texto plano y HTML estilizado) con el resumen financiero segregado por moneda, y el archivo `agenda_vencimientos.csv` adjunto con codificación UTF-8 con BOM.
+- Cualquier texto introductorio redactado por un modelo de lenguaje debe ser escapado apropiadamente para prevenir inyecciones HTML.

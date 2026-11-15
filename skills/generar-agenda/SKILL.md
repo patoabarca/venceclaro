@@ -8,8 +8,8 @@ description: Genera un archivo CSV estructurado con la agenda de vencimientos or
 ## Objetivo
 Exportar la lista ordenada de comprobantes confirmados a un archivo CSV estructurado, garantizando compatibilidad inmediata con Microsoft Excel en configuración regional argentina y preservando la separación entre monedas.
 
-## Entradas
-- **registros**: Lista de registros ordenados de tipo `FacturaConfirmada`.
+## Entradas (`invocar(entrada: dict) -> dict`)
+- **registros**: Lista de registros ordenados de tipo `FacturaConfirmada` o dicts equivalentes.
 - **ruta_destino**: (Opcional) Ruta de guardado en disco para el archivo `.csv`.
 
 ## Pasos de Ejecución
@@ -29,15 +29,18 @@ Exportar la lista ordenada de comprobantes confirmados a un archivo CSV estructu
    Retornar la cadena de texto CSV o escribir los bytes con codificación UTF-8-SIG en el destino indicado.
 
 ## Referencias a Consultar
-- [politica-agenda.md](file:///c:/Users/Asus/Documents/Diplomatura%20IA/venceclaro/skills/generar-agenda/references/politica-agenda.md): Formato de columnas, directivas de codificación para Excel y prohibición de mezcla de monedas.
+- [politica-agenda.md](references/politica-agenda.md): Formato de columnas, directivas de codificación para Excel y prohibición de mezcla de monedas.
 
 ## Ejecutable
 - Bash: `scripts/ejecutar.sh <registros_ordenados.json> [--salida <agenda.csv>]`
 - Python: `python scripts/ejecutar.py <registros_ordenados.json> [--salida <agenda.csv>]`
 
-## Salida
-- Contenido de texto o archivo CSV codificado en `utf-8-sig`.
-- Diccionario de subtotales por moneda.
+## Salida de `invocar`
+Diccionario con:
+- `csv`: Texto plano del CSV generado.
+- `csv_bytes`: Bytes codificados en `utf-8-sig` con BOM.
+- `totales_por_moneda`: Diccionario con subtotales float por moneda.
+- `totales_decimal`: Diccionario con subtotales Decimal por moneda.
 
 ## Manejo de Errores
 - Si la lista de entrada está vacía, genera un CSV con únicamente los encabezados reglamentarios.

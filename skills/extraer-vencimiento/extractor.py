@@ -254,3 +254,38 @@ def extraer_datos_factura(
         excluido=False,
         texto_extraido_crudo=texto,
     )
+
+ESQUEMA_ENTRADA = {
+    "type": "object",
+    "properties": {
+        "archivo": {
+            "type": "string",
+            "description": "Nombre o ruta del archivo de factura en PDF a procesar.",
+        },
+        "contenido_bytes": {
+            "type": "string",
+            "description": "Contenido binario opcional en memoria (si no se lee desde disco).",
+        },
+    },
+    "required": ["archivo"],
+}
+
+
+def invocar(entrada: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Contrato estándar de la skill: invocar(entrada: dict) -> dict.
+    Envuelve extraer_datos_factura sin alterar la lógica de negocio.
+    """
+    archivo = entrada.get("archivo")
+    if not archivo:
+        raise ValueError("El parámetro 'archivo' es obligatorio en la entrada de extraer-vencimiento.")
+
+    contenido = entrada.get("contenido_bytes")
+    nombre_archivo = Path(archivo).name
+    fuente = contenido if contenido is not None else Path(archivo)
+
+    registro_extraido = extraer_datos_factura(fuente, nombre_archivo)
+    return {
+        "registro": registro_extraido.a_diccionario(),
+        "objeto": registro_extraido,
+    }

@@ -84,3 +84,70 @@ def calcular_totales_por_moneda(
         if reg.importe is not None and reg.moneda:
             totales[reg.moneda] += reg.importe
     return dict(totales)
+
+ESQUEMA_ENTRADA = {
+    "type": "object",
+    "properties": {
+        "registros": {
+            "type": "array",
+            "items": {"type": "object"},
+            "description": "Lista de registros ordenados de facturas confirmadas a exportar.",
+        },
+        "ruta_destino": {
+            "type": "string",
+            "description": "Ruta opcional de guardado del archivo CSV en disco.",
+        },
+    },
+    "required": ["registros"],
+}
+
+
+def invocar(entrada: dict) -> dict:
+    """
+    Contrato estándar de la skill: invocar(entrada: dict) -> dict.
+    Envuelve generar_agenda_csv, generar_agenda_bytes y calcular_totales_por_moneda.
+    """
+    registros_in = entrada.get("registros", [])
+    if not isinstance(registros_in, list):
+        raise TypeError("El parámetro 'registros' debe ser una lista.")
+
+    from datetime import date
+    from decimal import Decimal
+
+    objetos = []
+    for r in registros_in:
+        if isinstance(r, (FacturaConfirmada, RegistroRevision)):
+            objetos.append(r)
+        elif isinstance(r, dict):
+            f_val = r.get("fecha_vencimiento")
+            if isinstance(f_val, str):
+                f_obj = date.fromisoformat(f_val)
+            else:
+                f_obj = f_val
+
+            imp_val = r.get("importe")
+            imp_dec = Decimal(str(imp_val)) if imp_val is not None else Decimal("0.00")
+
+            reg = FacturaConfirmada(
+                id=r.get("id", ""),
+                archivo_origen=r.get("archivo_origen", ""),
+                empresa=r.get("empresa", ""),
+                servicio=r.get("servicio", ""),
+                importe=imp_dec,
+                moneda=r.get("moneda", "ARS"),
+                fecha_vencimiento=f_obj,
+                fue_modificado=r.get("fue_modificado", False),
+            )
+            objetos.append(reg)
+
+    ruta_destino = entrada.get("ruta_destino")
+    csv_str = generar_agenda_csv(objetos, ruta_destino=ruta_destino)
+    csv_bytes = generar_agenda_bytes(objetos)
+    totales = calcular_totales_por_moneda(objetos)
+
+    return {
+        "csv": csv_str,
+        "csv_bytes": csv_bytes,
+        "totales_por_moneda": {k: float(v) for k, v in totales.items()},
+        "totales_decimal": totales,
+    }

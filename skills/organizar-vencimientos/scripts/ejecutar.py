@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Punto de entrada ejecutable para la skill orquestadora organizar-vencimientos.
-Uso: python ejecutar.py <factura1.pdf> [factura2.pdf ...] [--salida agenda.csv] [--auto-confirmar]
+Uso: python ejecutar.py <factura1.pdf> [factura2.pdf ...] [--salida agenda.csv] [--auto-confirmar] [--enviar-a <correo>] [--dry-run] [--sin-llm]
 """
 
 import argparse
@@ -20,7 +20,7 @@ from orquestador import coordinar_organizacion_vencimientos
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Orquesta el flujo completo de VenceClaro: extracción, revisión, ordenamiento y agenda."
+        description="Orquesta el flujo completo de VenceClaro mediante LLM y skills especializadas."
     )
     parser.add_argument(
         "archivos",
@@ -38,9 +38,23 @@ def main():
         help="Confirmar y continuar automáticamente si todos los datos extraídos son válidos.",
     )
     parser.add_argument(
+        "--enviar-a",
+        help="Dirección de correo electrónico de destino para enviar la agenda.",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Activa el modo simulación para el envío de correo sin conectar a internet.",
+    )
+    parser.add_argument(
+        "--sin-llm",
+        action="store_true",
+        help="Ejecuta en modo puramente determinista sin invocar a Anthropic Claude.",
+    )
+    parser.add_argument(
         "--json",
         action="store_true",
-        help="Salida estructurada en JSON.",
+        help="Salida estructurada en JSON incluyendo la traza de decisiones.",
     )
 
     args = parser.parse_args()
@@ -57,6 +71,9 @@ def main():
         archivos=archivos_tuplas,
         salida_csv=args.salida,
         auto_confirmar=args.auto_confirmar,
+        enviar_a=args.enviar_a,
+        dry_run=args.dry_run,
+        sin_llm=args.sin_llm,
     )
 
     if args.json:
@@ -67,6 +84,14 @@ def main():
         for msg in resultado["mensajes"]:
             print(f"  * {msg}")
 
+        if resultado.get("resumen_llm"):
+            print(f"\n[Resumen del Agente]: {resultado['resumen_llm']}")
+
+        if resultado.get("traza"):
+            print("\n--- TRAZA DE DECISIONES DEL AGENTE ---")
+            for t in resultado["traza"]:
+                print(f"Paso {t['paso']}: [{t['skill']}] -> {t['resultado']}")
+
         if resultado.get("registros_ordenados"):
             print("\n--- AGENDA ORDENADA GENERADA ---")
             for fila in resultado["registros_ordenados"]:
@@ -76,6 +101,11 @@ def main():
                 )
             if args.salida:
                 print(f"\nArchivo CSV generado en: {args.salida}")
+
+        if resultado.get("envio"):
+            env = resultado["envio"]
+            print(f"\n[Despacho de Correo]: {env['mensaje']} (Modo: {env['modo']})")
+
         elif resultado.get("requieren_revision"):
             print("\n[ATENCIÓN] Hay comprobantes que requieren revisión o confirmación.")
             print("Ejecute la interfaz web interactiva con 'streamlit run app.py' para revisar y confirmar.")

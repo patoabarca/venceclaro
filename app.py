@@ -7,13 +7,11 @@ from decimal import Decimal
 from pathlib import Path
 from typing import List
 
-try:
-    from dotenv import load_dotenv
-    ruta_env = Path(__file__).resolve().parent / ".env"
-    if ruta_env.exists():
-        load_dotenv(ruta_env)
-except ImportError:
-    pass
+from dotenv import load_dotenv
+
+ruta_env = Path(__file__).resolve().parent / ".env"
+if ruta_env.exists():
+    load_dotenv(ruta_env)
 
 import pandas as pd
 import streamlit as st
@@ -23,7 +21,6 @@ BASE_DIR = Path(__file__).resolve().parent
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
-from core.agent import AgenteVencimientos
 from core.models import (
     EstadoProceso,
     RegistroRevision,
@@ -31,14 +28,14 @@ from core.models import (
     formatear_importe_argentino,
 )
 from core.parser_utils import parsear_fecha_argentina, parsear_importe_argentino
-from core.skill_loader import obtener_generador
-
-generar_agenda_bytes = obtener_generador().generar_agenda_bytes
+from core.skill_loader import obtener_skill
+from core.skill_loader import obtener_orquestador
+OrquestadorVencimientos = obtener_orquestador().OrquestadorVencimientos
 
 
 # Configuración de página
 st.set_page_config(
-    page_title="VenceClaro - Organizador de Vencimientos",
+    page_title="VenceClaro - Organizador de Vencimientos con LLM",
     page_icon="📅",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -86,6 +83,13 @@ st.markdown(
         border-radius: 4px;
         border: 1px solid #fde68a;
     }
+    .llm-box {
+        background-color: #f0fdf4;
+        border-left: 4px solid #16a34a;
+        padding: 12px 16px;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -94,8 +98,8 @@ st.markdown(
 
 def inicializar_sesion():
     """Garantiza la persistencia de estado durante la interacción de Streamlit."""
-    if "agente" not in st.session_state:
-        st.session_state.agente = AgenteVencimientos()
+    if "orquestador" not in st.session_state:
+        st.session_state.orquestador = OrquestadorVencimientos()
     if "fase" not in st.session_state:
         st.session_state.fase = "ingesta"  # "ingesta", "revision", "agenda"
     if "uploader_key" not in st.session_state:
@@ -105,37 +109,43 @@ def inicializar_sesion():
 
 
 def reiniciar_todo():
-    st.session_state.agente.reiniciar()
+    st.session_state.orquestador.reiniciar()
     st.session_state.fase = "ingesta"
     st.session_state.datos_edicion.clear()
     st.session_state.uploader_key += 1
 
 
 inicializar_sesion()
-agente: AgenteVencimientos = st.session_state.agente
+orquestador: OrquestadorVencimientos = st.session_state.orquestador
 
 
 # Encabezado y Alcance
 st.markdown('<div class="main-title">📅 VenceClaro</div>', unsafe_allow_html=True)
 st.markdown(
-    '<div class="sub-title">Organizador inteligente y transparente de facturas y servicios con flujo determinista de 4 skills.</div>',
+    '<div class="sub-title">Organizador de facturas y servicios con Agente LLM y 5 skills descubiertas dinámicamente.</div>',
     unsafe_allow_html=True,
 )
 
-with st.expander("ℹ️ Acerca de este proyecto educativo y su alcance", expanded=False):
+# Indicador de modo LLM vs determinista
+if orquestador.usar_llm and orquestador.cliente_llm:
+    st.success("🤖 **Modo Agente con LLM Activo (Anthropic Claude)**: El orquestador usa Tool Calling para delegar en las skills.")
+else:
+    st.info("⚡ **Modo Determinista Activo**: No se detectó `ANTHROPIC_API_KEY`. El orquestador ejecuta el flujo con guardas deterministas.")
+
+with st.expander("ℹ️ Acerca de la arquitectura de 5 skills de VenceClaro", expanded=False):
     st.markdown(
         """
-        **VenceClaro** es un proyecto demostrativo de un **agente determinista con 4 skills en secuencia**:
-        1. **`organizar-vencimientos` (Orquestadora)**: Controla el ciclo de ingesta, coordina las skills especializadas y gestiona la supervisión humana (*Human-in-the-Loop*).
-        2. **`extraer-vencimiento` (Especializada)**: Extrae datos estructurados desde PDFs seleccionables conservando evidencia textual estricta.
-        3. **`ordenar-vencimientos` (Especializada)**: Ordena de forma cronológica ascendente con desempate estable por empresa y archivo.
-        4. **`generar-agenda` (Especializada)**: Produce una agenda descargable en CSV regional argentino (`;` y coma decimal) para Excel.
+        **VenceClaro** implementa la arquitectura solicitada por la cátedra:
+        1. **`organizar-vencimientos` (Orquestadora)**: Dueña del agente y del flujo. Recibe las herramientas y coordina con LLM o modo determinista.
+        2. **`extraer-vencimiento` (Especializada)**: Extrae datos estructurados desde PDFs seleccionables conservando evidencia textual.
+        3. **`ordenar-vencimientos` (Especializada)**: Ordena cronológicamente por vencimiento ascendente con desempate estable.
+        4. **`generar-agenda` (Especializada)**: Produce el CSV regional argentino (`;` y coma decimal) para Excel con monedas separadas.
+        5. **`enviar-agenda` (Especializada)**: Despacha la agenda por Gmail SMTP (TLS 587) con autorización explícita o simulación educativa.
 
-        > **Límites declarados del MVP:**
-        > - Requiere archivos PDF con **capa de texto seleccionable** (no incluye OCR para imágenes o escaneos).
-        > - No inventa datos ni realiza redondeos aproximados.
-        > - No mezcla importes de monedas distintas en totales acumulados.
-        > - Ingesta acumulativa: podés cargar facturas de a una o en lotes sucesivos para consolidarlas en una única agenda.
+        > **Seguridad y Veracidad:**
+        > - El LLM **nunca calcula ni modifica** importes, fechas ni monedas. Esas tareas son 100% deterministas.
+        > - El texto de los documentos se trata como **datos puros, nunca como instrucciones** (protección anti prompt-injection).
+        > - El destinatario del correo es suministrado por el usuario, nunca por el modelo.
         """
     )
 
@@ -165,9 +175,9 @@ if boton_agregar:
     if not archivos_subidos:
         st.warning("Por favor, seleccioná al menos un archivo PDF antes de presionar el botón.")
     else:
-        with st.spinner("Skill 'extraer-vencimiento': extrayendo datos y evidencia de los documentos..."):
+        with st.spinner("Orquestador ejecutando extracción con las skills especializadas..."):
             lista_tuplas = [(f.name, f.getvalue()) for f in archivos_subidos]
-            nuevos = agente.agregar_archivos(lista_tuplas)
+            nuevos = orquestador.agregar_archivos(lista_tuplas)
 
             # Inicializar los datos editables en sesión para cada nuevo registro
             for reg in nuevos:
@@ -186,12 +196,24 @@ if boton_agregar:
         st.rerun()
 
 # Si ya hay comprobantes en el orquestador
-if agente.registros_revision:
+if orquestador.registros_revision:
     st.markdown("---")
-    st.markdown(f"#### 📦 Facturas en el lote actual: **{len(agente.registros_revision)} comprobante(s)**")
+    st.markdown(f"#### 📦 Facturas en el lote actual: **{len(orquestador.registros_revision)} comprobante(s)**")
+
+    # Mostrar resumen del LLM si existe
+    if orquestador.resumen_llm:
+        st.markdown(
+            f"""
+            <div class="llm-box">
+                <strong>📝 Resumen del Agente Orquestador:</strong><br>
+                {orquestador.resumen_llm}
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
     filas_resumen = []
-    for r in agente.registros_revision:
+    for r in orquestador.registros_revision:
         vto_txt = r.fecha_vencimiento.strftime("%d/%m/%Y") if r.fecha_vencimiento else "⚠️ Sin fecha"
         imp_txt = f"{formatear_importe_argentino(r.importe)} {r.moneda}" if r.importe else "⚠️ Sin importe"
         filas_resumen.append({
@@ -207,7 +229,7 @@ if agente.registros_revision:
     # Pregunta explícita de coordinación del orquestador
     st.info(
         f"🤖 **Coordinación del Orquestador:** "
-        f"Tenés **{len(agente.registros_revision)} comprobante(s)** listos para la agenda. "
+        f"Tenés **{len(orquestador.registros_revision)} comprobante(s)** listos para la agenda. "
         "¿Deseás seguir cargando más facturas o avanzar al control de revisión y confirmación?"
     )
 
@@ -220,7 +242,7 @@ if agente.registros_revision:
             st.rerun()
 
 # Estado visible del proceso
-estado_actual = agente.estado
+estado_actual = orquestador.estado
 clase_badge = {
     EstadoProceso.INICIAL: "badge-inicial",
     EstadoProceso.EXTRAYENDO: "badge-revision",
@@ -242,16 +264,27 @@ texto_estado = {
 }.get(estado_actual, str(estado_actual))
 
 st.markdown(
-    f'<div><strong>Estado del Agente:</strong> <span class="badge-status {clase_badge}">{texto_estado}</span></div>',
+    f'<div><strong>Estado del Orquestador:</strong> <span class="badge-status {clase_badge}">{texto_estado}</span></div>',
     unsafe_allow_html=True,
 )
+
+# Traza de auditoría del agente visible
+if orquestador.traza:
+    with st.expander("🕵️ Ver Traza de Decisiones del Agente (Tool Calls y Políticas)", expanded=False):
+        for paso in orquestador.traza:
+            razon_txt = f" | Razón: <em>{paso.razon_llm}</em>" if paso.razon_llm else ""
+            st.markdown(
+                f"- **Paso {paso.paso}:** Skill `[{paso.skill_invocada}]` {razon_txt}<br>"
+                f"&nbsp;&nbsp;↳ <em>Resultado:</em> `{paso.resultado_resumen}`",
+                unsafe_allow_html=True,
+            )
 
 
 # Sección 2: Tabla de Revisión (Human-in-the-Loop)
 mostrar_revision = (
     (st.session_state.fase in ("revision", "agenda"))
-    or (agente.estado in (EstadoProceso.DATOS_CONFIRMADOS, EstadoProceso.ORDENAMIENTO_COMPLETADO, EstadoProceso.AGENDA_LISTA))
-) and bool(agente.registros_revision)
+    or (orquestador.estado in (EstadoProceso.DATOS_CONFIRMADOS, EstadoProceso.ORDENAMIENTO_COMPLETADO, EstadoProceso.AGENDA_LISTA))
+) and bool(orquestador.registros_revision)
 
 if mostrar_revision:
     st.divider()
@@ -262,7 +295,7 @@ if mostrar_revision:
 
     registros_editados: List[RegistroRevision] = []
 
-    for idx, reg in enumerate(agente.registros_revision):
+    for idx, reg in enumerate(orquestador.registros_revision):
         datos_guardados = st.session_state.datos_edicion.get(reg.id, {})
         with st.container(border=True):
             col_head1, col_head2 = st.columns([3, 1])
@@ -298,7 +331,6 @@ if mostrar_revision:
                     disabled=excluir,
                 )
             with c3:
-                # Importe como texto para respetar punto de miles o decimales
                 imp_orig = formatear_importe_argentino(reg.importe) if reg.importe is not None else ""
                 imp_val_str = st.text_input(
                     "Importe (ej: 25.000,50) *",
@@ -335,7 +367,6 @@ if mostrar_revision:
                 else:
                     st.write("No se pudo extraer evidencia textual automática para este comprobante.")
 
-                # Mostrar valores originales vs editados para auditoría
                 st.caption(
                     f"Valores originales extraídos: Empresa: '{reg.valores_originales.get('empresa')}' | "
                     f"Importe: '{formatear_importe_argentino(reg.valores_originales.get('importe'))}' | "
@@ -345,7 +376,7 @@ if mostrar_revision:
             # Parsear importe editado
             importe_dec = parsear_importe_argentino(imp_val_str)
 
-            # Actualizar datos de edición
+            # Actualizar datos de edición en la sesión
             st.session_state.datos_edicion[reg.id] = {
                 "empresa": empresa_val,
                 "servicio": servicio_val,
@@ -356,7 +387,6 @@ if mostrar_revision:
                 "excluido": excluir,
             }
 
-            # Construir objeto actualizado
             reg_actualizado = RegistroRevision(
                 id=reg.id,
                 archivo_origen=reg.archivo_origen,
@@ -373,44 +403,40 @@ if mostrar_revision:
             registros_editados.append(reg_actualizado)
 
     st.markdown("<br>", unsafe_allow_html=True)
-    col_conf, col_volver = st.columns([2, 1])
+    col_conf, _ = st.columns([2, 3])
     with col_conf:
         boton_confirmar = st.button(
-            "✅ Confirmar datos y generar agenda consolidada",
+            "✅ Confirmar datos y generar agenda definitiva",
             type="primary",
             use_container_width=True,
         )
-    with col_volver:
-        if st.button("➕ Agregar más facturas al lote", use_container_width=True):
-            st.session_state.fase = "ingesta"
-            st.rerun()
 
     if boton_confirmar:
-        valido, errores = agente.validar_y_confirmar(registros_editados)
+        valido, errores = orquestador.validar_y_confirmar(registros_editados)
         if not valido:
-            st.error("No se pudo generar la agenda debido a los siguientes impedimentos:")
+            st.error("No se pudo generar la agenda debido a los siguientes impedimentos obligatorios:")
             for e in errores:
                 st.markdown(f"- ❌ {e}")
             st.warning("Corregí los datos faltantes o marcá 'Excluir comprobante' para continuar.")
         else:
             st.session_state.fase = "agenda"
-            st.success("¡Datos confirmados! Flujo reanudado con ordenamiento y generación de agenda consolidada.")
+            st.success("¡Datos confirmados! Flujo reanudado con ordenamiento y generación de agenda.")
             st.rerun()
 
 
-# Sección 3: Agenda Consolidada y Descarga
-if agente.estado == EstadoProceso.AGENDA_LISTA and agente.registros_ordenados:
+# Sección 3: Agenda Consolidada Ordenada y Exportación
+if orquestador.estado == EstadoProceso.AGENDA_LISTA and orquestador.registros_ordenados:
     st.divider()
-    st.subheader("3. Agenda de Vencimientos Consolidada y Ordenada")
+    st.subheader("3. Agenda Consolidada de Vencimientos")
 
-    if agente.archivos_excluidos:
+    if orquestador.archivos_excluidos:
         st.info(
-            f"ℹ️ **Facturas excluidas del reporte final ({len(agente.archivos_excluidos)}):** "
-            + ", ".join([f"`{a}`" for a in agente.archivos_excluidos])
+            f"ℹ️ **Facturas excluidas del reporte final ({len(orquestador.archivos_excluidos)}):** "
+            + ", ".join([f"`{a}`" for a in orquestador.archivos_excluidos])
         )
 
     # Preparar DataFrame para visualización
-    filas = [r.a_fila_agenda() for r in agente.registros_ordenados]
+    filas = [r.a_fila_agenda() for r in orquestador.registros_ordenados]
     df_agenda = pd.DataFrame(filas)
 
     st.dataframe(
@@ -427,16 +453,19 @@ if agente.estado == EstadoProceso.AGENDA_LISTA and agente.registros_ordenados:
     # Resumen de totales por moneda (estrictamente separados)
     st.markdown("#### Resumen Financiero por Moneda")
     st.caption("Conforme a la política de la clase, las monedas se mantienen separadas sin mezclar importes.")
-    cols_totales = st.columns(len(agente.totales_por_moneda) if agente.totales_por_moneda else 1)
-    for col, (mon, tot) in zip(cols_totales, agente.totales_por_moneda.items()):
+    cols_totales = st.columns(len(orquestador.totales_por_moneda) if orquestador.totales_por_moneda else 1)
+    for col, (mon, tot) in zip(cols_totales, orquestador.totales_por_moneda.items()):
         with col:
             st.metric(
                 label=f"Total a pagar en {mon}",
                 value=f"{formatear_importe_argentino(tot)} {mon}",
             )
 
-    # Botón de Descarga
-    csv_bytes = generar_agenda_bytes(agente.registros_ordenados)
+    # Descarga directa vía CSV generado por la skill
+    skill_gen = obtener_skill("generar-agenda")
+    res_gen = skill_gen.invocar({"registros": orquestador.registros_ordenados})
+    csv_bytes = res_gen["csv_bytes"]
+
     st.download_button(
         label="📥 Descargar Agenda Consolidada en CSV (Configuración Regional Argentina para Excel)",
         data=csv_bytes,
@@ -497,12 +526,13 @@ if agente.estado == EstadoProceso.AGENDA_LISTA and agente.registros_ordenados:
             st.warning("Por favor, ingresá una dirección de correo de destino.")
         else:
             st.session_state["email_destino_guardado"] = email_dest
-            with st.spinner("Skill 'enviar-agenda': empaquetando mensaje y conectando con Gmail..."):
-                exito, msg, modo = agente.enviar_agenda_por_correo(
+            with st.spinner("Orquestador despachando agenda vía skill 'enviar-agenda'..."):
+                exito, msg, modo = orquestador.despachar_agenda_por_correo(
                     destinatario=email_dest,
                     remitente=remitente_ui if remitente_ui else None,
                     password=pass_ui if pass_ui else None,
                     dry_run=usar_dry_run,
+                    autorizacion_usuario=True,
                 )
             if exito:
                 if modo == "SIMULACION":

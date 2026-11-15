@@ -6,7 +6,6 @@ Uso: python ejecutar.py --destino <correo> [--csv <archivo.csv>] [--dry-run]
 
 import argparse
 import sys
-from decimal import Decimal
 from pathlib import Path
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
@@ -15,7 +14,7 @@ for p in [str(SKILL_DIR), str(BASE_DIR)]:
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from remitente import despachar_agenda_gmail
+from remitente import invocar
 
 
 def main():
@@ -48,35 +47,28 @@ def main():
         action="store_true",
         help="Ejecuta en modo simulación educativa sin realizar conexión de red.",
     )
+    parser.add_argument(
+        "--intro",
+        help="Texto introductorio opcional para el cuerpo del correo.",
+    )
 
     args = parser.parse_args()
 
-    # Cargar CSV
-    if args.csv:
-        ruta_csv = Path(args.csv)
-    else:
-        ruta_csv = BASE_DIR / "agenda_vencimientos.csv"
+    entrada = {
+        "destinatario": args.destino,
+        "ruta_csv": args.csv or "agenda_vencimientos.csv",
+        "remitente": args.remitente,
+        "password": args.password,
+        "dry_run": args.dry_run,
+        "texto_intro": args.intro,
+    }
 
-    if ruta_csv.exists():
-        csv_bytes = ruta_csv.read_bytes()
-    else:
-        # CSV mínimo de prueba si no existe archivo
-        csv_bytes = "Vencimiento;Empresa;Servicio;Importe;Moneda;Archivo de origen\r\n".encode("utf-8-sig")
-
-    exito, mensaje, modo = despachar_agenda_gmail(
-        destinatario=args.destino,
-        csv_bytes=csv_bytes,
-        totales_por_moneda={"ARS": Decimal("15000.00")},
-        remitente=args.remitente,
-        password=args.password,
-        dry_run=args.dry_run,
-    )
-
-    if exito:
-        print(f"[{modo}] {mensaje}")
+    res = invocar(entrada)
+    if res["exito"]:
+        print(f"[OK] {res['mensaje']} (Modo: {res['modo']})")
         sys.exit(0)
     else:
-        print(f"[ERROR] {mensaje}", file=sys.stderr)
+        print(f"[ERROR] {res['mensaje']}", file=sys.stderr)
         sys.exit(1)
 
 

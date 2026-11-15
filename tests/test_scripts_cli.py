@@ -124,5 +124,5 @@ def test_cli_enviar_agenda_dry_run(tmp_path):
     )
 
     assert proc.returncode == 0, f"Error en CLI enviar: {proc.stderr}"
-    assert "[SIMULACION]" in proc.stdout
+    assert "SIMULACION" in proc.stdout
     assert "prueba@diplomatura.com" in proc.stdout

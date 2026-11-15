@@ -1,90 +1,121 @@
 import sys
 from decimal import Decimal
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
-from core.agent import AgenteVencimientos
-from core.skill_loader import obtener_remitente
+from core.skill_loader import descubrir_skills, obtener_skill, _cargar_modulo_python
 
-EJEMPLOS_DIR = BASE_DIR / "ejemplos"
+_rem_info = descubrir_skills()["enviar-agenda"]
+_rem_mod = _cargar_modulo_python("enviar-agenda", _rem_info.modulo_entrada)
+validar_email = _rem_mod.validar_email
+construir_mensaje = _rem_mod.construir_mensaje
+
+CSV_TEST = b"Vencimiento;Empresa;Servicio;Importe;Moneda;Archivo de origen\r\n15/06/2026;Edesur;Luz;25.430,75;ARS;edesur.pdf\r\n"
+TOTALES_TEST = {"ARS": Decimal("25430.75")}
 
 
 def test_validacion_sintaxis_email():
-    remitente_mod = obtener_remitente()
-
-    assert remitente_mod.validar_email("usuario@gmail.com") is True
-    assert remitente_mod.validar_email("nombre.apellido+tag@empresa.com.ar") is True
-    assert remitente_mod.validar_email("invalido@") is False
-    assert remitente_mod.validar_email("sin_arroba.com") is False
-    assert remitente_mod.validar_email("") is False
+    assert validar_email("usuario@gmail.com") is True
+    assert validar_email("nombre.apellido+tag@empresa.com.ar") is True
+    assert validar_email("correo_invalido") is False
+    assert validar_email("@sin_usuario.com") is False
+    assert validar_email("") is False
 
 
 def test_construccion_mensaje_con_adjunto():
-    remitente_mod = obtener_remitente()
-
-    csv_dummy = "Vencimiento;Empresa;Servicio;Importe;Moneda;Archivo de origen\r\n15/05/2026;Edesur;Luz;14.250,00;ARS;factura.pdf\r\n".encode("utf-8-sig")
-    totales = {"ARS": Decimal("14250.00")}
-
-    texto = remitente_mod.armar_cuerpo_texto(totales)
-    html = remitente_mod.armar_cuerpo_html(totales)
-
-    assert "14.250,00" in texto
-    assert "14.250,00" in html
-
-    msg = remitente_mod.construir_mensaje(
+    msg = construir_mensaje(
         remitente="remitente@gmail.com",
         destinatario="destino@gmail.com",
         asunto="Prueba Agenda",
-        cuerpo_texto=texto,
-        cuerpo_html=html,
-        csv_bytes=csv_dummy,
-        nombre_adjunto="agenda_vencimientos.csv",
+        cuerpo_texto="Texto plano de prueba",
+        cuerpo_html="<p>HTML de prueba</p>",
+        csv_bytes=CSV_TEST,
     )
 
     assert msg["From"] == "remitente@gmail.com"
     assert msg["To"] == "destino@gmail.com"
     assert msg["Subject"] == "Prueba Agenda"
 
-    # Verificar que contenga el adjunto
     adjuntos = [p for p in msg.iter_attachments()]
     assert len(adjuntos) == 1
     assert adjuntos[0].get_filename() == "agenda_vencimientos.csv"
+    assert adjuntos[0].get_payload(decode=True) == CSV_TEST
 
 
 def test_despacho_modo_simulacion_educativo():
-    remitente_mod = obtener_remitente()
+    skill = obtener_skill("enviar-agenda")
+    res = skill.invocar({
+        "destinatario": "estudiante@ejemplo.com",
+        "csv_bytes": CSV_TEST,
+        "totales_por_moneda": TOTALES_TEST,
+        "dry_run": True,
+    })
 
-    csv_dummy = "dummy_content".encode("utf-8-sig")
-    exito, msg, modo = remitente_mod.despachar_agenda_gmail(
-        destinatario="alumno@universidad.edu.ar",
-        csv_bytes=csv_dummy,
-        totales_por_moneda={"ARS": Decimal("1000.00")},
-        dry_run=True,
-    )
-
-    assert exito is True
-    assert modo == "SIMULACION"
-    assert "alumno@universidad.edu.ar" in msg
+    assert res["exito"] is True
+    assert res["modo"] == "SIMULACION"
+    assert "Modo Simulación Educativo" in res["mensaje"]
 
 
-def test_agente_flujo_enviar_agenda_correo():
-    agente = AgenteVencimientos()
+def test_error_explicito_sin_credenciales_y_sin_dry_run():
+    skill = obtener_skill("enviar-agenda")
+    with patch.dict("os.environ", {"GMAIL_REMITENTE": "", "GMAIL_APP_PASSWORD": ""}):
+        res = skill.invocar({
+            "destinatario": "alguien@ejemplo.com",
+            "csv_bytes": CSV_TEST,
+            "totales_por_moneda": TOTALES_TEST,
+            "dry_run": False,
+        })
+        assert res["exito"] is False
+        assert res["modo"] == "ERROR"
+        assert "Faltan credenciales" in res["mensaje"]
 
-    archivos = [
-        ("factura_edesur_luz.pdf", EJEMPLOS_DIR / "factura_edesur_luz.pdf"),
-    ]
-    agente.procesar_archivos_iniciales(archivos)
-    agente.validar_y_confirmar(agente.registros_revision)
 
-    # El agente debe permitir despachar en modo simulación
-    exito, msg, modo = agente.enviar_agenda_por_correo(
-        destinatario="profesor@diplomatura.edu.ar",
-        dry_run=True,
-    )
+def test_envio_real_mockeado_con_smtp():
+    skill = obtener_skill("enviar-agenda")
+    with patch("smtplib.SMTP") as mock_smtp:
+        instancia = MagicMock()
+        mock_smtp.return_value.__enter__.return_value = instancia
 
-    assert exito is True
-    assert modo == "SIMULACION"
-    assert any("profesor@diplomatura.edu.ar" in m for m in agente.mensajes_estado)
+        res = skill.invocar({
+            "destinatario": "cliente@ejemplo.com",
+            "csv_bytes": CSV_TEST,
+            "totales_por_moneda": TOTALES_TEST,
+            "remitente": "yo@gmail.com",
+            "password": "pass_de_aplicacion",
+            "dry_run": False,
+        })
+
+        assert res["exito"] is True
+        assert res["modo"] == "REAL"
+        assert "exitosamente" in res["mensaje"]
+        assert instancia.starttls.called
+        assert instancia.login.called
+        assert instancia.send_message.called
+
+
+def test_error_autenticacion_smtp_sin_exponer_password():
+    import smtplib
+    skill = obtener_skill("enviar-agenda")
+    with patch("smtplib.SMTP") as mock_smtp:
+        instancia = MagicMock()
+        instancia.login.side_effect = smtplib.SMTPAuthenticationError(535, b"Authentication failed")
+        mock_smtp.return_value.__enter__.return_value = instancia
+
+        password_secreta = "secreto_clave_123"
+        res = skill.invocar({
+            "destinatario": "cliente@ejemplo.com",
+            "csv_bytes": CSV_TEST,
+            "totales_por_moneda": TOTALES_TEST,
+            "remitente": "yo@gmail.com",
+            "password": password_secreta,
+            "dry_run": False,
+        })
+
+        assert res["exito"] is False
+        assert res["modo"] == "ERROR"
+        assert "SMTPAuthenticationError" in res["mensaje"]
+        assert password_secreta not in res["mensaje"]

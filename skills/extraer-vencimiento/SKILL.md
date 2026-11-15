@@ -8,9 +8,9 @@ description: Extrae campos estructurados (empresa, servicio, importe, moneda, ve
 ## Objetivo
 Procesar un documento PDF de factura de servicios y extraer un registro de datos estructurado acompañado de la evidencia textual que respalda cada valor obtenido, respetando los estándares numéricos y de fechas argentinos.
 
-## Entradas
-- **fuente**: Archivo PDF accesible por ruta del sistema de archivos, flujo binario o bytes en memoria.
-- **nombre_archivo**: Nombre representativo del archivo de origen (ej. `factura_luz.pdf`).
+## Entradas (`invocar(entrada: dict) -> dict`)
+- **archivo**: Ruta o nombre del archivo PDF accesible en disco.
+- **contenido_bytes**: (Opcional) Contenido binario en memoria.
 
 ## Pasos de Ejecución
 1. **Verificación de capa de texto**:
@@ -29,24 +29,16 @@ Procesar un documento PDF de factura de servicios y extraer un registro de datos
    Construir el objeto `FacturaExtraida` con el mapa de evidencias y la lista de observaciones de validación.
 
 ## Referencias a Consultar
-- [politica-extraccion.md](file:///c:/Users/Asus/Documents/Diplomatura%20IA/venceclaro/skills/extraer-vencimiento/references/politica-extraccion.md): Reglas de no invención de datos, formato argentino y tratamiento pasivo de documentos.
+- [politica-extraccion.md](references/politica-extraccion.md): Reglas de no invención de datos, formato argentino y tratamiento pasivo de documentos.
 
 ## Ejecutable
 - Bash: `scripts/ejecutar.sh <ruta_factura.pdf> [--json]`
 - Python: `python scripts/ejecutar.py <ruta_factura.pdf> [--json]`
 
-## Salida
-Objeto o diccionario `FacturaExtraida` conteniendo:
-- `id`: Identificador único del registro.
-- `archivo_origen`: Nombre del archivo procesado.
-- `empresa`: Razón social o nombre comercial identificado.
-- `servicio`: Rubro o tipo de servicio prestado.
-- `importe`: Monto en tipo `Decimal`.
-- `moneda`: Código de moneda (`ARS`, `USD`).
-- `fecha_vencimiento`: Fecha en formato ISO (`AAAA-MM-DD`).
-- `evidencia_texto`: Diccionario con las frases exactas del documento que justifican los datos.
-- `requiere_revision`: Indicador booleano de si hay campos faltantes o ambiguos.
-- `observaciones`: Lista de advertencias para el usuario.
+## Salida de `invocar`
+Diccionario con:
+- `registro`: Diccionario serializado con campos clave, formato argentino y evidencia textual.
+- `objeto`: Instancia de `FacturaExtraida`.
 
 ## Manejo de Errores
 - **Archivo inexistente o ilegible**: Retorna código de salida distinto de cero en CLI o un registro marcado con `excluido = true` y observación de error en la API Python.

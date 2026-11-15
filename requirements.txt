@@ -3,3 +3,6 @@ pypdf>=4.2.0
 reportlab>=4.1.0
 pandas>=2.0.0
 pytest>=8.0.0
+python-dotenv>=1.0.0
+pyyaml>=6.0.0
+anthropic>=0.20.0
