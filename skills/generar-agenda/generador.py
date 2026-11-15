@@ -60,8 +60,8 @@ def generar_agenda_csv(
 
     if ruta_destino:
         path = Path(ruta_destino)
-        # Guardar con utf-8-sig (con BOM) para que Excel reconozca tildes y caracteres especiales
-        path.write_text(contenido_csv, encoding="utf-8-sig")
+        # Guardar con utf-8-sig en modo binario para preservar saltos CRLF idénticos en cualquier SO
+        path.write_bytes(contenido_csv.encode("utf-8-sig"))
 
     return contenido_csv
 

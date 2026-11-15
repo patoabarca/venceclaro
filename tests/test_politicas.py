@@ -289,28 +289,41 @@ def test_age_4_codificacion_utf8_con_bom_y_tildes():
 
 
 def test_age_5_salto_de_linea_crlf(tmp_path):
-    """AGE-5: Salto de línea CRLF (\\r\\n)."""
+    """AGE-5: Salto de línea CRLF (\\r\\n) sin \\r\\r\\n en archivo en disco y en memoria (cross-OS)."""
     reg = FacturaConfirmada(
         id="1", archivo_origen="f.pdf", empresa="Edesur", servicio="Luz",
         importe=Decimal("1000.00"), moneda="ARS", fecha_vencimiento=date(2026, 6, 15)
     )
-    ruta_salida = tmp_path / "agenda_crlf.csv"
+    # 1. Ruta A: Skill directa con ruta_destino
+    ruta_skill = tmp_path / "agenda_skill_crlf.csv"
     skill = obtener_skill("generar-agenda")
-    res = skill.invocar({"registros": [reg], "ruta_destino": str(ruta_salida)})
+    res = skill.invocar({"registros": [reg], "ruta_destino": str(ruta_skill)})
 
-    # En memoria los bytes deben contener CRLF
+    # En memoria
+    assert res["csv_bytes"].startswith(b"\xef\xbb\xbf")
     assert b"\r\n" in res["csv_bytes"]
     assert b"\r\r\n" not in res["csv_bytes"]
 
-    # En archivo en disco guardado mediante write_text:
-    bytes_disco = ruta_salida.read_bytes()
-    # Si en Windows write_text produce \r\r\n debido a la traducción universal de newlines,
-    # el test falla explícitamente reportando la discrepancia entre código y política.
-    assert b"\r\r\n" not in bytes_disco, (
-        f"DISCREPANCIA [AGE-5]: El archivo en disco contiene saltos duplicados {bytes_disco[-10:]!r} "
-        f"(\\r\\r\\n) en lugar de saltos CRLF limpios (\\r\\n) debido a que path.write_text "
-        f"traduce automáticamente saltos de línea en Windows."
+    # En disco para la skill
+    bytes_skill = ruta_skill.read_bytes()
+    assert bytes_skill.startswith(b"\xef\xbb\xbf")
+    assert b"\r\n" in bytes_skill
+    assert b"\r\r\n" not in bytes_skill
+
+    # 2. Ruta B: Orquestador con coordinar_organizacion_vencimientos(salida_csv=..., auto_confirmar=True)
+    ruta_orquestador = tmp_path / "agenda_orq_crlf.csv"
+    res_orq = coordinar_organizacion_vencimientos(
+        archivos=[("factura_edesur_luz.pdf", EJEMPLOS_DIR / "factura_edesur_luz.pdf")],
+        salida_csv=ruta_orquestador,
+        auto_confirmar=True,
+        sin_llm=True,
     )
+    assert res_orq["estado"] == "AGENDA_LISTA"
+
+    bytes_orq = ruta_orquestador.read_bytes()
+    assert bytes_orq.startswith(b"\xef\xbb\xbf")
+    assert b"\r\n" in bytes_orq
+    assert b"\r\r\n" not in bytes_orq
 
 
 def test_age_6_segregacion_estricta_de_monedas():

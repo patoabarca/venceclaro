@@ -784,7 +784,7 @@ def coordinar_organizacion_vencimientos(
             return resultado
 
         if salida_csv and orquestador.agenda_csv:
-            Path(salida_csv).write_text(orquestador.agenda_csv, encoding="utf-8-sig")
+            Path(salida_csv).write_bytes(orquestador.agenda_csv.encode("utf-8-sig"))
 
         # Despacho opcional si se suministró correo
         if enviar_a:
