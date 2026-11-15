@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VenceClaro - Presentación Ejecutiva</title>
+    <title>VenceClaro - Presentación Ejecutiva y Técnica</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
@@ -74,11 +74,11 @@
                 <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
                     VenceClaro <span class="text-xs bg-sky-500/20 text-sky-400 border border-sky-500/30 px-2 py-0.5 rounded-full font-mono">Diplomatura IA</span>
                 </h1>
-                <p class="text-xs text-slate-400">Agente Orquestador y Skills Modulares Deterministas</p>
+                <p class="text-xs text-slate-400">Agente Orquestador con LLM (Gemini) y 5 Skills Modulares</p>
             </div>
         </div>
         <div class="flex items-center space-x-2">
-            <span id="slideIndicator" class="text-xs font-mono font-bold bg-slate-800 text-sky-400 px-3 py-1 rounded-full border border-slate-700">Diapo 1 de 3</span>
+            <span id="slideIndicator" class="text-xs font-mono font-bold bg-slate-800 text-sky-400 px-3 py-1 rounded-full border border-slate-700">Diapo 1 de 5</span>
             <button onclick="prevSlide()" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition" title="Anterior (Flecha Izquierda)">◀</button>
             <button onclick="nextSlide()" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition" title="Siguiente (Flecha Derecha)">▶</button>
         </div>
@@ -87,13 +87,92 @@
     <!-- Contenedor Principal de Diapositivas -->
     <main class="flex-1 relative overflow-hidden">
 
-        <!-- ==================== DIAPOSITIVA 1 ==================== -->
-        <section id="slide-1" class="slide active p-6 justify-start space-y-4">
+        <!-- ==================== DIAPOSITIVA 1: PORTADA & RESUMEN ==================== -->
+        <section id="slide-1" class="slide active p-6 justify-between space-y-4">
             <div>
-                <div class="inline-block text-xs uppercase tracking-wider text-sky-400 font-semibold mb-0.5">Fundamento Teórico & Arquitectura Modular</div>
-                <h2 class="text-xl font-black text-white">1. El Agente Coordinador y sus 5 Skills (con Estructura de Archivos)</h2>
-                <p class="text-xs text-slate-400 max-w-3xl">
-                    Implementación determinista: una única entidad orquestadora con estado (<span class="text-sky-300 font-medium">Stateful</span>) coordina cuatro unidades operativas atómicas y sin estado (<span class="text-emerald-300 font-medium">Stateless</span>).
+                <div class="inline-flex items-center gap-2 text-xs uppercase tracking-wider text-sky-400 font-semibold mb-1">
+                    <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
+                    Arquitectura de Agentes de IA · Trabajo Final
+                </div>
+                <h2 class="text-2xl font-black text-white tracking-tight">VenceClaro: Organizador de Vencimientos con Agente LLM y 5 Skills</h2>
+                <p class="text-xs text-slate-300 max-w-4xl mt-1 leading-relaxed">
+                    Sistema integral que resuelve la ingesta, auditoría y agenda de comprobantes en PDF. Implementa un <span class="text-sky-300 font-semibold">agente orquestador con estado (Stateful)</span> guiado por LLM (Google Gemini con fallback determinista) que descubre dinámicamente cuatro <span class="text-emerald-300 font-semibold">skills atómicas sin estado (Stateless)</span> bajo contratos formales <code>SKILL.md</code>, punto de control humano estricto y despacho seguro por Gmail SMTP.
+                </p>
+            </div>
+
+            <!-- Cuadrícula de 4 Métricas Clave -->
+            <div class="grid grid-cols-4 gap-4 my-auto">
+                <div class="glass-panel p-4 rounded-2xl border-slate-700/80 flex flex-col justify-between hover:border-sky-500/50 transition">
+                    <div>
+                        <div class="text-2xl mb-1">🧩</div>
+                        <span class="text-xs font-bold text-sky-400 uppercase tracking-wider block">5 Skills Modulares</span>
+                        <h3 class="text-sm font-extrabold text-white mt-0.5">Contratos SKILL.md</h3>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                        1 Orquestadora (dueña del flujo) y 4 Especializadas atómicas descubiertas en tiempo de ejecución.
+                    </p>
+                </div>
+
+                <div class="glass-panel p-4 rounded-2xl border-slate-700/80 flex flex-col justify-between hover:border-emerald-500/50 transition">
+                    <div>
+                        <div class="text-2xl mb-1">🧪</div>
+                        <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider block">78 Tests Automatizados</span>
+                        <h3 class="text-sm font-extrabold text-white mt-0.5">100% Cobertura Exitosa</h3>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                        Pruebas sin red: mock de Gemini, simulación SMTP, guardas de estado y prevención de path traversal.
+                    </p>
+                </div>
+
+                <div class="glass-panel p-4 rounded-2xl border-slate-700/80 flex flex-col justify-between hover:border-amber-500/50 transition">
+                    <div>
+                        <div class="text-2xl mb-1">📜</div>
+                        <span class="text-xs font-bold text-amber-400 uppercase tracking-wider block">32 Reglas Verificables</span>
+                        <h3 class="text-sm font-extrabold text-white mt-0.5">Políticas con IDs Únicos</h3>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                        Cada bullet normativo tiene su ID ([EXT], [ORD], [AGE], [ENV], [ORQ]) y test asociado, más 2 tests meta.
+                    </p>
+                </div>
+
+                <div class="glass-panel p-4 rounded-2xl border-slate-700/80 flex flex-col justify-between hover:border-rose-500/50 transition">
+                    <div>
+                        <div class="text-2xl mb-1">🛡️</div>
+                        <span class="text-xs font-bold text-rose-400 uppercase tracking-wider block">0 Alucinaciones</span>
+                        <h3 class="text-sm font-extrabold text-white mt-0.5">Guardas Deterministas</h3>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                        Cálculos numéricos, orden cronológico y fechas 100% en código. El LLM jamás inventa datos ni importes.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Resumen de Arquitectura y Stack -->
+            <div class="glass-panel p-4 rounded-2xl border-slate-800 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-3">
+                    <span class="text-xl">⚙️</span>
+                    <div>
+                        <span class="text-white font-bold block">Tecnología y Entorno Operativo:</span>
+                        <span class="text-slate-400">Python 3.10+ · Streamlit Web · Terminal CLI · Google Gemini API (google-genai) · Gmail SMTP TLS 587</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] bg-slate-800 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700 font-mono">Windows / Linux / macOS</span>
+                    <button onclick="nextSlide()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold px-3 py-1.5 rounded-lg transition text-xs flex items-center gap-1.5">
+                        <span>Explorar Arquitectura</span> <span>➔</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ==================== DIAPOSITIVA 2: ARQUITECTURA & SKILLS ==================== -->
+        <section id="slide-2" class="slide p-6 justify-start space-y-4">
+            <div>
+                <div class="inline-block text-xs uppercase tracking-wider text-sky-400 font-semibold mb-0.5">Diseño Modular y Descubrimiento en Runtime</div>
+                <h2 class="text-xl font-black text-white">2. Arquitectura del Orquestador y Descubrimiento Dinámico de Skills</h2>
+                <p class="text-xs text-slate-400 max-w-4xl">
+                    <code>core/skill_loader.py</code> descubre las skills inspeccionando sus contratos <code>SKILL.md</code>. Cada skill expone la función de contrato <code>invocar(entrada: dict) -> dict</code> y su <code>ESQUEMA_ENTRADA</code> validado con Pydantic.
                 </p>
             </div>
 
@@ -101,7 +180,7 @@
             <div class="grid grid-cols-12 gap-5">
                 <!-- Columna Izquierda: Botones de Skills -->
                 <div class="col-span-4 flex flex-col space-y-2">
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Seleccioná una Skill para auditar:</span>
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Auditoría de Skills del Sistema:</span>
                     
                     <button onclick="selectSkill('orquestador')" id="btn-orquestador" class="tab-btn active text-left px-3.5 py-2.5 rounded-xl border border-slate-700 text-xs font-medium transition flex items-center justify-between">
                         <span>🎯 organizar-vencimientos</span>
@@ -125,13 +204,13 @@
 
                     <button onclick="selectSkill('enviar')" id="btn-enviar" class="tab-btn text-left px-3.5 py-2.5 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-xs font-medium transition flex items-center justify-between">
                         <span>📧 enviar-agenda</span>
-                        <span class="text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded font-bold">API / EMAIL</span>
+                        <span class="text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded font-bold">SMTP / EMAIL</span>
                     </button>
 
-                    <!-- Resumen del Agente Central -->
+                    <!-- Resumen del Loader -->
                     <div class="glass-panel p-3 rounded-xl border-slate-800 text-[11px] text-slate-400 mt-2">
-                        <span class="text-sky-400 font-bold block mb-1">🤖 AgenteVencimientos (core/agent.py)</span>
-                        Contiene la máquina de estados y el buffer acumulador. Invoca las skills a través de <code>core/skill_loader.py</code>.
+                        <span class="text-sky-400 font-bold block mb-1">🔍 Registro Dinámico (core/skill_loader.py)</span>
+                        Descubre metadatos y esquemas. El orden del flujo lo gobierna estrictamente <code>OrquestadorVencimientos</code> mediante su máquina de estados determinista.
                     </div>
                 </div>
 
@@ -141,41 +220,41 @@
                         <div class="flex justify-between items-start mb-2">
                             <div>
                                 <h3 id="skill-title" class="text-lg font-bold text-white flex items-center gap-2">🎯 organizar-vencimientos</h3>
-                                <p id="skill-role" class="text-xs text-sky-400 font-mono">Rol: Coordinadora de ciclo de vida, ingesta acumulativa y supervisión humana</p>
+                                <p id="skill-role" class="text-xs text-sky-400 font-mono">Rol: Orquestadora central con estado, ingesta acumulativa y máquina de estados</p>
                             </div>
                             <span id="skill-type" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/40">Stateful (Con Estado)</span>
                         </div>
 
                         <p id="skill-desc" class="text-xs text-slate-300 leading-relaxed mb-3">
-                            Coordina la ejecución secuencial determinista. Mantiene el lote acumulado de facturas, gestiona la pregunta interactiva de si se desean sumar más comprobantes, entrega los datos al usuario en el Punto de Control y delega el ordenamiento, exportación y despacho.
+                            Dueña del ciclo de vida y del agente (OrquestadorVencimientos). Expone herramientas al LLM en etapas controladas, detiene el proceso en REVISION_REQUERIDA y ejecuta el despacho directo sin exponer credenciales.
                         </p>
 
                         <!-- Estructura de Archivos de la Skill -->
                         <div class="bg-slate-950/90 border border-slate-800 rounded-xl p-3 mb-3">
                             <div class="flex items-center justify-between mb-1.5">
                                 <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                                    <span>📁</span> Estructura de Archivos de la Skill:
+                                    <span>📁</span> Anatomía Modular de la Skill:
                                 </span>
-                                <span class="text-[10px] text-slate-500 font-mono">Convención Modular de la Cátedra</span>
+                                <span class="text-[10px] text-slate-500 font-mono">Convención Estándar de la Cátedra</span>
                             </div>
                             <pre id="skill-files" class="text-[11px] font-mono text-emerald-300 leading-relaxed overflow-x-auto m-0">skills/organizar-vencimientos/
-├── SKILL.md                      # Procedimiento normativo, roles y especificación
+├── SKILL.md                      # Contrato YAML frontmatter, especificación y roles
 ├── references/
-│   └── politica-orquestacion.md  # Políticas de handoff humano, bloqueo y trazabilidad
-├── orquestador.py                # Lógica ejecutable de coordinación
+│   └── politica-orquestacion.md  # Políticas normativas [ORQ-1] a [ORQ-7]
+├── orquestador.py                # Lógica ejecutable: OrquestadorVencimientos
 └── scripts/
-    ├── ejecutar.py               # CLI Python (--auto-confirmar, --salida, --json)
+    ├── ejecutar.py               # CLI principal (--salida, --auto-confirmar, --sin-llm)
     └── ejecutar.sh               # Wrapper ejecutable Bash portable</pre>
                         </div>
 
                         <div class="grid grid-cols-2 gap-2 text-xs">
                             <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800">
-                                <span class="font-bold text-slate-400 block mb-0.5">📥 Entradas:</span>
-                                <span id="skill-inputs" class="text-slate-200 text-[11px]">Colección de PDFs en memoria o rutas de disco.</span>
+                                <span class="font-bold text-slate-400 block mb-0.5">📥 Entradas Formales:</span>
+                                <span id="skill-inputs" class="text-slate-200 text-[11px]">Colección de tuplas (nombre, bytes/ruta) y opciones de confirmación.</span>
                             </div>
                             <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800">
-                                <span class="font-bold text-slate-400 block mb-0.5">📤 Salidas:</span>
-                                <span id="skill-outputs" class="text-slate-200 text-[11px]">Agenda consolidada, archivos excluidos y auditoría.</span>
+                                <span class="font-bold text-slate-400 block mb-0.5">📤 Salidas Formales:</span>
+                                <span id="skill-outputs" class="text-slate-200 text-[11px]">Agenda consolidada, traza de pasos PasoTraza, resumen y acuse de envío.</span>
                             </div>
                         </div>
                     </div>
@@ -185,7 +264,7 @@
                         <div>
                             <span class="text-[11px] font-bold text-rose-300 uppercase tracking-wide">Regla de Oro (Lo que NUNCA debe hacer):</span>
                             <p id="skill-rule" class="text-[11px] text-rose-200/90 mt-0.5">
-                                No contiene heurísticas de bajo nivel de PDF por regex, no ordena listas internamente y no escribe líneas de texto CSV.
+                                No contiene heurísticas de bajo nivel de PDF, no ordena listas directamente en memoria y no genera líneas de texto CSV a mano.
                             </p>
                         </div>
                     </div>
@@ -194,38 +273,138 @@
         </section>
 
 
-        <!-- ==================== DIAPOSITIVA 2 ==================== -->
-        <section id="slide-2" class="slide p-6 justify-start space-y-4">
+        <!-- ==================== DIAPOSITIVA 3: LLM & GUARDAS ==================== -->
+        <section id="slide-3" class="slide p-6 justify-start space-y-4">
             <div>
-                <div class="inline-block text-xs uppercase tracking-wider text-sky-400 font-semibold mb-0.5">Flujo Operativo Paso a Paso</div>
-                <h2 class="text-xl font-black text-white">2. Workflow Determinista con Supervisión Humana Real</h2>
-                <p class="text-xs text-slate-400 max-w-3xl">
-                    El orquestador no delega decisiones críticas a ciegas. Cada comprobante es auditado y validado en un punto de control estricto (*Human-in-the-Loop*).
+                <div class="inline-block text-xs uppercase tracking-wider text-sky-400 font-semibold mb-0.5">Inteligencia Artificial Segura y Determinista</div>
+                <h2 class="text-xl font-black text-white">3. Agente con LLM (Google Gemini) y Guardas Deterministas</h2>
+                <p class="text-xs text-slate-400 max-w-4xl">
+                    Equilibrio estricto entre la capacidad de razonamiento del LLM y la seguridad absoluta en código. El modelo propone herramientas, pero las guardas deterministas validan cada transición de estado.
+                </p>
+            </div>
+
+            <!-- Comparativa: Lo que HACE vs Lo que NUNCA HACE -->
+            <div class="grid grid-cols-2 gap-4">
+                <!-- Lo que el LLM SÍ hace -->
+                <div class="glass-panel p-4 rounded-2xl border-sky-500/30 bg-sky-950/20 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-base text-sky-400 font-bold">✨</span>
+                            <h3 class="text-xs font-bold text-sky-300 uppercase tracking-wider">Lo que el LLM SÍ hace:</h3>
+                        </div>
+                        <ul class="text-xs text-slate-300 space-y-2">
+                            <li class="flex items-start gap-2">
+                                <span class="text-sky-400 font-bold">✓</span>
+                                <span><strong>Selección dinámica de herramientas:</strong> Evalúa el lote y emite <code>FunctionCall</code> hacia las skills autorizadas para la fase activa.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-sky-400 font-bold">✓</span>
+                                <span><strong>Redacción de resúmenes explicativos:</strong> Informa al usuario qué comprobantes se detectaron, cuáles son dudosos y por qué se requiere revisión.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-sky-400 font-bold">✓</span>
+                                <span><strong>Personalización de saludo y texto del correo:</strong> Redacta la introducción del email acompañando el cuadro financiero.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-sky-400 font-bold">✓</span>
+                                <span><strong>Preservación de firmas de pensamiento:</strong> Almacena y reenvía <code>thought_signature</code> de Gemini en la reconstrucción del historial.</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="text-[10px] text-sky-400/80 font-mono mt-3 pt-2 border-t border-sky-800/40">
+                        Proveedor predeterminado: <code>gemini-2.5-flash</code> con Tool Calling sin ejecución automática.
+                    </div>
+                </div>
+
+                <!-- Lo que el LLM NUNCA hace -->
+                <div class="glass-panel p-4 rounded-2xl border-rose-500/30 bg-rose-950/20 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-base text-rose-400 font-bold">🛡️</span>
+                            <h3 class="text-xs font-bold text-rose-300 uppercase tracking-wider">Lo que el LLM NUNCA hace (Guardas en Código):</h3>
+                        </div>
+                        <ul class="text-xs text-slate-300 space-y-2">
+                            <li class="flex items-start gap-2">
+                                <span class="text-rose-400 font-bold">⛔</span>
+                                <span><strong>Cálculos numéricos y fechas:</strong> Importes, fechas y divisas son procesados 100% por código determinista con <code>Decimal</code>.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-rose-400 font-bold">⛔</span>
+                                <span><strong>Fijación de destinatarios:</strong> El correo lo ingresa el usuario en UI/CLI; el LLM jamás lo inventa ni lo lee del PDF.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-rose-400 font-bold">⛔</span>
+                                <span><strong>Acceso a credenciales:</strong> La contraseña de aplicación de Gmail nunca se expone al LLM ni figura en prompts o logs.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-rose-400 font-bold">⛔</span>
+                                <span><strong>Path Traversal:</strong> <code>extraer-vencimiento</code> rechaza rutas ajenas a <code>_archivos_en_memoria</code> (/tmp/otro.pdf, ../x.pdf).</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="text-rose-400 font-bold">⛔</span>
+                                <span><strong>Anti Prompt-Injection:</strong> Las frases del PDF se consideran datos inertes, jamás comandos o instrucciones operativas.</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="text-[10px] text-rose-300/80 font-mono mt-3 pt-2 border-t border-rose-800/40">
+                        La skill <code>enviar-agenda</code> NO se expone al LLM: se ejecuta solo bajo autorización explícita.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fila Inferior: Fallback Determinista y Trazabilidad -->
+            <div class="grid grid-cols-2 gap-4 text-xs">
+                <div class="glass-panel p-3 rounded-xl border-slate-700 flex items-center justify-between">
+                    <div>
+                        <span class="text-amber-400 font-bold block mb-0.5">⚡ Fallback Determinista Local</span>
+                        <span class="text-slate-300 text-[11px]">Sin clave <code>GEMINI_API_KEY</code> o con <code>--sin-llm</code>, el flujo ejecuta la misma secuencia y genera exactamente el mismo CSV.</span>
+                    </div>
+                    <span class="text-xs bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-1 rounded font-mono">100% Resiliente</span>
+                </div>
+
+                <div class="glass-panel p-3 rounded-xl border-slate-700 flex items-center justify-between">
+                    <div>
+                        <span class="text-emerald-400 font-bold block mb-0.5">🔍 Trazabilidad de Decisiones</span>
+                        <span class="text-slate-300 text-[11px]">Cada acción registra un objeto <code>PasoTraza</code> (paso, skill, argumentos, resultado) auditable en la UI y el CLI.</span>
+                    </div>
+                    <span class="text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2 py-1 rounded font-mono">PasoTraza</span>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ==================== DIAPOSITIVA 4: WORKFLOW & HUMAN-IN-THE-LOOP ==================== -->
+        <section id="slide-4" class="slide p-6 justify-start space-y-4">
+            <div>
+                <div class="inline-block text-xs uppercase tracking-wider text-sky-400 font-semibold mb-0.5">Ciclo de Vida y Supervisión Humana</div>
+                <h2 class="text-xl font-black text-white">4. Flujo Operativo y Supervisión Humana (Human-in-the-Loop)</h2>
+                <p class="text-xs text-slate-400 max-w-4xl">
+                    Máquina de estados rigurosa: <code>INICIAL ➔ EXTRAYENDO ➔ REVISION_REQUERIDA ➔ DATOS_CONFIRMADOS ➔ ORDENAMIENTO_COMPLETADO ➔ AGENDA_LISTA</code>. El avance se bloquea obligatoriamente hasta la validación humana.
                 </p>
             </div>
 
             <!-- Stepper Interactivo Central -->
-            <div class="my-auto py-2">
+            <div class="my-auto py-1">
                 <!-- Barra de Pasos -->
-                <div class="flex items-center justify-between max-w-4xl mx-auto mb-5 px-4">
+                <div class="flex items-center justify-between max-w-4xl mx-auto mb-4 px-4">
                     <div onclick="selectStep(1)" class="flex flex-col items-center cursor-pointer group">
                         <div id="step-num-1" class="step-circle active w-9 h-9 rounded-full bg-sky-600 border-2 border-sky-400 flex items-center justify-center font-bold text-white text-xs transition">1</div>
-                        <span class="text-xs mt-1.5 font-medium text-slate-300 group-hover:text-white">Ingesta Incremental</span>
+                        <span class="text-xs mt-1 font-medium text-slate-300 group-hover:text-white">Ingesta Acumulativa</span>
                     </div>
                     <div class="flex-1 h-0.5 bg-slate-800 mx-2"></div>
                     <div onclick="selectStep(2)" class="flex flex-col items-center cursor-pointer group">
                         <div id="step-num-2" class="step-circle w-9 h-9 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center font-bold text-slate-400 text-xs transition">2</div>
-                        <span class="text-xs mt-1.5 font-medium text-slate-400 group-hover:text-white">Extracción & Evidencia</span>
+                        <span class="text-xs mt-1 font-medium text-slate-400 group-hover:text-white">Extracción & Evidencia</span>
                     </div>
                     <div class="flex-1 h-0.5 bg-slate-800 mx-2"></div>
                     <div onclick="selectStep(3)" class="flex flex-col items-center cursor-pointer group">
                         <div id="step-num-3" class="step-circle w-9 h-9 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center font-bold text-slate-400 text-xs transition">3</div>
-                        <span class="text-xs mt-1.5 font-medium text-slate-400 group-hover:text-white">Control Humano</span>
+                        <span class="text-xs mt-1 font-medium text-slate-400 group-hover:text-white">Control Humano</span>
                     </div>
                     <div class="flex-1 h-0.5 bg-slate-800 mx-2"></div>
                     <div onclick="selectStep(4)" class="flex flex-col items-center cursor-pointer group">
                         <div id="step-num-4" class="step-circle w-9 h-9 rounded-full bg-slate-800 border-2 border-slate-700 flex items-center justify-center font-bold text-slate-400 text-xs transition">4</div>
-                        <span class="text-xs mt-1.5 font-medium text-slate-400 group-hover:text-white">Orden & Agenda CSV</span>
+                        <span class="text-xs mt-1 font-medium text-slate-400 group-hover:text-white">Agenda CSV Regional</span>
                     </div>
                 </div>
 
@@ -236,118 +415,118 @@
                         <span id="step-badge" class="text-[10px] font-mono bg-sky-500/20 text-sky-300 border border-sky-500/30 px-2 py-0.5 rounded-full">ESTADO: INICIAL / EXTRAYENDO</span>
                     </div>
                     <p id="step-desc" class="text-xs text-slate-300 mb-3 leading-relaxed">
-                        El usuario puede cargar facturas una por una o en lotes. El orquestador mantiene el lote acumulado en memoria sin reiniciar la sesión y pregunta explícitamente: <em>"¿Deseás seguir cargando más facturas o avanzar a la revisión?"</em>.
+                        El usuario carga comprobantes uno a uno o en lote. El orquestador acumula los comprobantes en memoria sin reiniciar la sesión y formula la pregunta de coordinación: <em>"¿Deseás seguir cargando más facturas o avanzar al control de revisión y confirmación?"</em>.
                     </p>
                     
-                    <div id="step-example" class="bg-slate-950/90 p-3.5 rounded-xl border border-slate-800 font-mono text-xs text-slate-300">
-                        <div class="text-slate-500 mb-1">// Ingesta interactiva en app.py:</div>
-                        <span class="text-emerald-400">agente.agregar_archivos([("factura_edesur.pdf", bytes)])</span><br>
-                        <span class="text-slate-400">Lote acumulado: 1 factura. Orquestador: ¿Desea sumar otra factura? [Sí] [Avanzar]</span><br>
-                        <span class="text-emerald-400">agente.agregar_archivos([("factura_telecom.pdf", bytes)])</span><br>
-                        <span class="text-sky-300">Lote final: 2 facturas listas para revisión conjunta en una sola agenda.</span>
+                    <div id="step-example" class="bg-slate-950/90 p-3 rounded-xl border border-slate-800 font-mono text-xs text-slate-300 leading-relaxed">
+                        <div class="text-slate-500 mb-1">// Coordinación de ingesta en app.py:</div>
+                        <span class="text-emerald-400">orquestador.agregar_archivos([("factura_edesur_luz.pdf", bytes)])</span><br>
+                        <span class="text-slate-400">Coordinación: "Tenés 1 comprobante listo. ¿Deseás seguir cargando o avanzar al control?"</span><br>
+                        <span class="text-emerald-400">orquestador.agregar_archivos([("factura_telecom_internet.pdf", bytes)])</span><br>
+                        <span class="text-sky-300">Lote acumulado: 2 comprobantes listos para validación conjunta.</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Footer Informativo Diapo 2 -->
+            <!-- Footer Informativo Diapo 4 -->
             <div class="flex justify-between items-center text-xs text-slate-500 pt-1 border-t border-slate-800/60">
-                <span>Cero alucinación: ante campos vacíos o ambiguos, el flujo se bloquea hasta confirmación.</span>
+                <span>Punto de control insoslayable: ningún dato pasa a la agenda final sin validación humana o autoconfirmación válida.</span>
                 <span class="text-sky-400 font-medium">Hacé clic en los pasos 1, 2, 3 o 4 para auditar cada fase ➔</span>
             </div>
         </section>
 
 
-        <!-- ==================== DIAPOSITIVA 3 ==================== -->
-        <section id="slide-3" class="slide p-6 justify-start space-y-4">
+        <!-- ==================== DIAPOSITIVA 5: CALIDAD & CASO REAL CRLF ==================== -->
+        <section id="slide-5" class="slide p-6 justify-start space-y-4">
             <div>
-                <div class="inline-block text-xs uppercase tracking-wider text-emerald-400 font-semibold mb-0.5">Integración Externa & Calidad de Software</div>
-                <h2 class="text-xl font-black text-white">3. Despacho por Correo (Gmail API) y Resiliencia Educativa</h2>
-                <p class="text-xs text-slate-400 max-w-3xl">
-                    Consumo seguro de servicios externos para la entrega de la agenda, complementado con un simulador educativo para evaluación docente.
+                <div class="inline-block text-xs uppercase tracking-wider text-emerald-400 font-semibold mb-0.5">Verificación Empírica y Robustez Técnica</div>
+                <h2 class="text-xl font-black text-white">5. Calidad del Software, Políticas Verificables y Caso Real CRLF</h2>
+                <p class="text-xs text-slate-400 max-w-4xl">
+                    78 tests automatizados, 32 reglas normativas auditadas por tests de comportamiento, tests meta de cobertura y resolución de discrepancias reales de interoperabilidad.
                 </p>
             </div>
 
-            <!-- Contenido Interactivo Diapo 3 -->
             <div class="grid grid-cols-12 gap-5 my-auto">
-                <!-- Columna 1: Demostrador de Envío -->
+                <!-- Columna 1: Políticas Verificables y Tests Meta -->
+                <div class="col-span-6 flex flex-col space-y-3">
+                    <div class="glass-panel p-4 rounded-2xl border-slate-700">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Suite de Pruebas pytest</span>
+                            <span class="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded">78 / 78 PASSED (100%)</span>
+                        </div>
+                        <h4 class="text-xs font-bold text-white mb-1.5">32 Reglas Normativas con IDs Verificables</h4>
+                        <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-300">
+                            <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800">
+                                <span class="text-sky-400 font-bold block">[EXT-1..8] Extracción</span>
+                                Veracidad, evidencia textual, formato numérico argentino y no-alucinación.
+                            </div>
+                            <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800">
+                                <span class="text-amber-400 font-bold block">[ORD-1..4] Ordenamiento</span>
+                                Cronología ascendente, desempate estable e inmutabilidad estricta.
+                            </div>
+                            <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800">
+                                <span class="text-emerald-400 font-bold block">[AGE-1..6] Agenda CSV</span>
+                                Columnas exactas, delimitador ';', UTF-8 BOM y segregación ARS/USD.
+                            </div>
+                            <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800">
+                                <span class="text-purple-400 font-bold block">[ENV-1..7] + [ORQ-1..7]</span>
+                                Despacho autorizado, credenciales protegidas y guardas de estado.
+                            </div>
+                        </div>
+
+                        <div class="text-[10px] text-slate-400 mt-2.5 pt-2 border-t border-slate-800 flex items-center justify-between">
+                            <span>🛡️ <strong>2 Tests Meta:</strong> Fallan si hay reglas sin test o tests huérfanos.</span>
+                            <span class="text-emerald-400 font-mono">Respaldo por Mutación</span>
+                        </div>
+                    </div>
+
+                    <!-- Caso Real CRLF -->
+                    <div class="glass-panel p-4 rounded-2xl border-amber-500/30 bg-amber-950/20">
+                        <div class="flex items-center gap-1.5 mb-1">
+                            <span class="text-amber-400 font-bold">🔧 Caso Real Resuelto (Discrepancia AGE-5):</span>
+                        </div>
+                        <p class="text-[11px] text-slate-300 leading-relaxed">
+                            En Windows, <code>Path.write_text</code> en modo texto traducía el fin de línea CRLF explícito (<code>\r\n</code>) a un doble retorno de carro corrupto (<code>\r\r\n</code>). Se corrigió reemplazándolo por <code>write_bytes(contenido.encode("utf-8-sig"))</code> en generador y orquestador, garantizando bytes idénticos en cualquier SO.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Columna 2: Simulador de Despacho y SMTP -->
                 <div class="col-span-6 glass-panel p-5 rounded-2xl border-slate-700 flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between mb-2">
                             <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
-                                <span>📧</span> Skill: enviar-agenda
+                                <span>📧</span> Despacho por Correo (Gmail SMTP TLS 587)
                             </h3>
-                            <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded-full font-mono">Gmail TLS 587</span>
+                            <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded-full font-mono">STARTTLS Seguro</span>
                         </div>
                         <p class="text-xs text-slate-300 leading-relaxed mb-3">
-                            Despacha la agenda vía SMTP seguro de Gmail utilizando una <strong>Contraseña de Aplicación de 16 caracteres</strong>, garantizando que nunca se exponga la contraseña personal del usuario.
+                            Despacha la agenda adjuntando el archivo CSV y cuadro financiero vía SMTP con <strong>Contraseña de Aplicación de 16 caracteres</strong>. Sin credenciales reales, cuenta con modo simulación (<code>dry_run=True</code>).
                         </p>
 
-                        <!-- Simulador Interactivo de Despacho -->
+                        <!-- Simulador Interactivo -->
                         <div class="bg-slate-900/90 p-3.5 rounded-xl border border-slate-800 space-y-2.5">
                             <div>
-                                <label class="text-[10px] font-bold text-slate-400 block mb-0.5">Destinatario:</label>
-                                <input type="email" id="demo-email" value="patoabarca07@gmail.com" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none focus:border-sky-500 font-mono">
+                                <label class="text-[10px] font-bold text-slate-400 block mb-0.5">Destinatario elegido por el usuario:</label>
+                                <input type="email" id="demo-email" value="docente@diplomatura.edu.ar" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none focus:border-sky-500 font-mono">
                             </div>
                             <div class="flex items-center gap-2">
                                 <label class="flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer">
                                     <input type="checkbox" id="demo-dryrun" checked class="rounded bg-slate-950 border-slate-700 text-sky-500">
-                                    <span>Modo Simulación Educativo</span>
+                                    <span>Modo Simulación (dry-run educativo)</span>
                                 </label>
                             </div>
                             <button onclick="simularEnvio()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-1.5 rounded-lg text-xs transition shadow-lg shadow-sky-600/30 flex items-center justify-center gap-1.5">
-                                <span>🚀</span> Probar Despacho
+                                <span>🚀</span> Probar Despacho Seguro
                             </button>
                             <div id="demo-result" class="text-[10px] p-2 rounded-lg bg-sky-950/60 border border-sky-500/30 text-sky-200 font-mono">
-                                Estado: Listo para simular o enviar.
+                                Estado: Listo para simulación o envío real.
                             </div>
                         </div>
                     </div>
 
                     <div class="text-[10px] text-slate-400 mt-3 border-t border-slate-800 pt-2">
-                        🔒 <strong>Seguridad:</strong> Credenciales protegidas en <code>.env</code>; nunca se registran en logs ni se exponen a terceros.
-                    </div>
-                </div>
-
-                <!-- Columna 2: Calidad y Respaldo de Pruebas -->
-                <div class="col-span-6 flex flex-col space-y-3">
-                    <!-- Tarjeta de Cobertura de Pruebas -->
-                    <div class="glass-panel p-4 rounded-2xl border-slate-700">
-                        <div class="flex items-center justify-between mb-1.5">
-                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Verificación Automatizada</span>
-                            <span class="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded">25 / 25 PASSED (100%)</span>
-                        </div>
-                        <h4 class="text-xs font-bold text-white mb-1.5">Suite Completa de Pruebas con pytest</h4>
-                        <ul class="text-[11px] text-slate-300 space-y-1">
-                            <li class="flex items-center gap-1.5">
-                                <span class="text-emerald-400 font-bold">✓</span> Ingesta incremental de facturas y descarte de duplicados.
-                            </li>
-                            <li class="flex items-center gap-1.5">
-                                <span class="text-emerald-400 font-bold">✓</span> Ordenamiento cronológico con desempate estable por empresa.
-                            </li>
-                            <li class="flex items-center gap-1.5">
-                                <span class="text-emerald-400 font-bold">✓</span> Delimitador regional <code>;</code> y codificación UTF-8 con BOM para Excel.
-                            </li>
-                            <li class="flex items-center gap-1.5">
-                                <span class="text-emerald-400 font-bold">✓</span> Segregación estricta de monedas (ARS y USD nunca mezcladas).
-                            </li>
-                            <li class="flex items-center gap-1.5">
-                                <span class="text-emerald-400 font-bold">✓</span> Validación de correo y empaquetado MIME multipart con adjunto.
-                            </li>
-                        </ul>
-                    </div>
-
-                    <!-- Tarjeta de Resiliencia para Corrección Docente -->
-                    <div class="glass-panel p-4 rounded-2xl border-slate-700 flex-1 flex flex-col justify-between">
-                        <div>
-                            <span class="text-xs font-bold text-amber-400 uppercase tracking-wider block mb-0.5">⭐ Valor Académico Agregado</span>
-                            <h4 class="text-xs font-bold text-white mb-0.5">Sandbox para Corrección Docente</h4>
-                            <p class="text-[11px] text-slate-300 leading-relaxed">
-                                Si el profesor ejecuta el trabajo sin haber cargado sus credenciales de Gmail, la skill detecta la ausencia y activa el <strong>Sandbox Simulado</strong>, empaquetando el CSV y confirmando la validez sin provocar errores ni interrumpir la evaluación.
-                            </p>
-                        </div>
-                        <div class="text-[10px] font-mono text-slate-400 bg-slate-900/60 p-2 rounded-lg border border-slate-800 mt-2">
-                            CLI: <code>python skills/enviar-agenda/scripts/ejecutar.py --destino mail@test.com --dry-run</code>
-                        </div>
+                        🔒 <strong>Seguridad:</strong> Si faltan credenciales y no se activa dry-run, el orquestador reporta error explícito sin exponer contraseñas en logs ni en mensajes de chat.
                     </div>
                 </div>
             </div>
@@ -362,6 +541,8 @@
             <button onclick="goToSlide(1)" id="dot-1" class="w-7 h-2 rounded-full bg-sky-500 transition-all"></button>
             <button onclick="goToSlide(2)" id="dot-2" class="w-2.5 h-2 rounded-full bg-slate-700 hover:bg-slate-600 transition-all"></button>
             <button onclick="goToSlide(3)" id="dot-3" class="w-2.5 h-2 rounded-full bg-slate-700 hover:bg-slate-600 transition-all"></button>
+            <button onclick="goToSlide(4)" id="dot-4" class="w-2.5 h-2 rounded-full bg-slate-700 hover:bg-slate-600 transition-all"></button>
+            <button onclick="goToSlide(5)" id="dot-5" class="w-2.5 h-2 rounded-full bg-slate-700 hover:bg-slate-600 transition-all"></button>
         </div>
         <div class="text-slate-400">Diplomatura en IA · VenceClaro</div>
     </footer>
@@ -369,7 +550,7 @@
     <!-- Lógica Interactiva JavaScript -->
     <script>
         let currentSlide = 1;
-        const totalSlides = 3;
+        const totalSlides = 5;
 
         function updateSlideUI() {
             for (let i = 1; i <= totalSlides; i++) {
@@ -413,97 +594,97 @@
             }
         });
 
-        // ==================== INTERACCIÓN DIAPO 1: SKILLS Y ARCHIVOS ====================
+        // ==================== INTERACCIÓN DIAPO 2: SKILLS Y ARCHIVOS ====================
         const skillsData = {
             orquestador: {
                 title: "🎯 organizar-vencimientos",
-                role: "Rol: Coordinadora de ciclo de vida, ingesta acumulativa y supervisión humana",
+                role: "Rol: Orquestadora central con estado, ingesta acumulativa y máquina de estados",
                 type: "Stateful (Con Estado)",
                 typeClass: "bg-amber-500/20 text-amber-300 border-amber-500/40",
-                desc: "Coordina la ejecución secuencial determinista. Mantiene el lote acumulado de facturas, gestiona la pregunta interactiva de si se desean sumar más comprobantes, entrega los datos al usuario en el Punto de Control y delega el ordenamiento, exportación y despacho.",
+                desc: "Dueña del ciclo de vida y del agente (OrquestadorVencimientos). Expone herramientas al LLM en etapas controladas, detiene el proceso en REVISION_REQUERIDA y ejecuta el despacho directo sin exponer credenciales.",
                 files: `skills/organizar-vencimientos/
-├── SKILL.md                      # Procedimiento normativo, roles y especificación
+├── SKILL.md                      # Contrato YAML frontmatter, especificación y roles
 ├── references/
-│   └── politica-orquestacion.md  # Políticas de handoff humano, bloqueo y trazabilidad
-├── orquestador.py                # Lógica ejecutable de coordinación
+│   └── politica-orquestacion.md  # Políticas normativas [ORQ-1] a [ORQ-7]
+├── orquestador.py                # Lógica ejecutable: OrquestadorVencimientos
 └── scripts/
-    ├── ejecutar.py               # CLI Python (--auto-confirmar, --salida, --json)
+    ├── ejecutar.py               # CLI principal (--salida, --auto-confirmar, --sin-llm)
     └── ejecutar.sh               # Wrapper ejecutable Bash portable`,
-                inputs: "Colección de PDFs en memoria o rutas de disco.",
-                outputs: "Agenda consolidada, archivos excluidos y auditoría.",
-                rule: "No contiene heurísticas de bajo nivel de PDF por regex, no ordena listas internamente y no escribe líneas de texto CSV."
+                inputs: "Colección de tuplas (nombre, bytes/ruta) y opciones de confirmación.",
+                outputs: "Agenda consolidada, traza de pasos PasoTraza, resumen y acuse de envío.",
+                rule: "No contiene heurísticas de bajo nivel de PDF, no ordena listas directamente en memoria y no genera líneas de texto CSV a mano."
             },
             extraer: {
                 title: "🔍 extraer-vencimiento",
-                role: "Rol: Análisis pasivo de documentos PDF y preservación de evidencia",
+                role: "Rol: Extracción de texto y comprobantes con captura de evidencia",
                 type: "Stateless (Sin Estado)",
                 typeClass: "bg-slate-700 text-slate-300 border-slate-600",
                 desc: "Transforma cada documento PDF con capa de texto en un registro estructurado (FacturaExtraida). Identifica empresa, servicio, fecha de vencimiento, importe numérico y moneda, reteniendo el fragmento textual original como evidencia no refutable.",
                 files: `skills/extraer-vencimiento/
-├── SKILL.md                      # Procedimiento normativo de lectura y parseo
+├── SKILL.md                      # Especificación normativa y esquema de entrada
 ├── references/
-│   └── politica-extraccion.md    # Directivas de veracidad y captura de evidencia
+│   └── politica-extraccion.md    # Directivas de veracidad [EXT-1] a [EXT-8]
 ├── extractor.py                  # Lógica de regex y parsing de PDFs con pypdf
 └── scripts/
     ├── ejecutar.py               # CLI Python (--json para pipelines)
     └── ejecutar.sh               # Entrypoint Bash ejecutable`,
                 inputs: "Bytes o archivo PDF individual con texto seleccionable.",
                 outputs: "Objeto FacturaExtraida con evidencia textual de respaldo.",
-                rule: "No ordena comprobantes ni decide si una factura incompleta debe quedar fuera de la agenda final."
+                rule: "Rechaza nombres fuera de _archivos_en_memoria (anti path-traversal); nunca decide si un comprobante incompleto se excluye."
             },
             ordenar: {
                 title: "🔢 ordenar-vencimientos",
                 role: "Rol: Ordenamiento cronológico determinista con desempate estable",
                 type: "Stateless (Sin Estado)",
                 typeClass: "bg-slate-700 text-slate-300 border-slate-600",
-                desc: "Aplica ordenamiento cronológico ascendente por fecha de vencimiento (AAAA-MM-DD). Si dos facturas vencen el mismo día, aplica criterio de desempate estable: primero alfabético por empresa emisora y luego por nombre de archivo de origen.",
+                desc: "Aplica ordenamiento cronológico ascendente por fecha de vencimiento (AAAA-MM-DD). Si dos facturas vencen el mismo día, aplica criterio de desempate determinista: primero alfabético por empresa (case-insensitive) y luego por nombre de archivo.",
                 files: `skills/ordenar-vencimientos/
-├── SKILL.md                      # Procedimiento de ordenamiento cronológico
+├── SKILL.md                      # Procedimiento normativo de ordenamiento
 ├── references/
-│   └── politica-ordenamiento.md  # Criterios de desempate estable y años bisiestos
+│   └── politica-ordenamiento.md  # Criterios de desempate estable [ORD-1] a [ORD-4]
 ├── ordenador.py                  # Algoritmo determinista de ordenación
 └── scripts/
     ├── ejecutar.py               # CLI Python de ordenamiento sobre JSON
     └── ejecutar.sh               # Entrypoint Bash ejecutable`,
                 inputs: "Lista de comprobantes confirmados (FacturaConfirmada).",
                 outputs: "Lista ordenada garantizando consistencia idéntica en cualquier plataforma.",
-                rule: "No modifica montos, fechas ni interpreta datos; falla explícitamente si recibe un registro sin fecha válida."
+                rule: "Inmutabilidad total: no modifica importes, fechas ni campos; falla explícitamente si recibe un registro sin fecha válida."
             },
             generar: {
                 title: "📑 generar-agenda",
-                role: "Rol: Exportación CSV bajo configuración regional argentina",
+                role: "Rol: Exportación CSV regional con BOM y segregación monetaria",
                 type: "Stateless (Sin Estado)",
                 typeClass: "bg-slate-700 text-slate-300 border-slate-600",
-                desc: "Genera el archivo CSV formateado específicamente para Microsoft Excel en español: delimitador punto y coma (;), separador decimal coma (,) y codificación UTF-8 con BOM (utf-8-sig) para evitar corrupción de tildes o caracteres especiales.",
+                desc: "Genera el archivo CSV formateado para Microsoft Excel en español: delimitador punto y coma (;), separador decimal coma (,) y codificación UTF-8 con BOM. Emplea write_bytes para preservar saltos CRLF limpios en cualquier sistema operativo.",
                 files: `skills/generar-agenda/
-├── SKILL.md                      # Procedimiento normativo de exportación
+├── SKILL.md                      # Especificación formal de exportación
 ├── references/
-│   └── politica-agenda.md        # Delimitador ';', coma decimal y segregación
-├── generador.py                  # Generador CSV con BOM y cálculo de subtotales
+│   └── politica-agenda.md        # Formato regional y segregación [AGE-1] a [AGE-6]
+├── generador.py                  # Generador CSV con write_bytes y totales por moneda
 └── scripts/
     ├── ejecutar.py               # CLI Python de exportación CSV (--salida)
     └── ejecutar.sh               # Entrypoint Bash ejecutable`,
                 inputs: "Lista ordenada de comprobantes confirmados.",
-                outputs: "Bytes de agenda_vencimientos.csv y subtotales por moneda.",
-                rule: "Segregación estricta de monedas: bajo ninguna circunstancia suma o combina montos en ARS con montos en USD."
+                outputs: "Bytes de agenda_vencimientos.csv y subtotales segregados por moneda.",
+                rule: "Segregación estricta de divisas: bajo ninguna circunstancia suma o combina montos en ARS con montos en USD."
             },
             enviar: {
                 title: "📧 enviar-agenda",
-                role: "Rol: Despacho seguro por correo (Gmail API / SMTP TLS 587)",
-                type: "API / Servicio Externo",
+                role: "Rol: Despacho seguro por correo (Gmail SMTP TLS 587)",
+                type: "Stateless / Servicio Externo",
                 typeClass: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
-                desc: "Empaqueta un correo electrónico MIME multipart con el resumen financiero en texto plano y HTML estilizado, adjuntando el archivo agenda_vencimientos.csv. Se conecta a Gmail con Contraseña de Aplicación de 16 caracteres y cuenta con Sandbox Educativo.",
+                desc: "Empaqueta un correo electrónico MIME multipart con el resumen financiero en texto plano y HTML estilizado, adjuntando agenda_vencimientos.csv. Se conecta a Gmail con Contraseña de Aplicación de 16 caracteres e incluye modo dry-run para pruebas.",
                 files: `skills/enviar-agenda/
-├── SKILL.md                      # Procedimiento de despacho por correo
+├── SKILL.md                      # Especificación de despacho por correo
 ├── references/
-│   └── politica-envio.md         # Reglas de protección de credenciales y sandbox
-├── remitente.py                  # Cliente Gmail SMTP (TLS 587) y armado MIME
+│   └── politica-envio.md         # Reglas de protección de credenciales [ENV-1] a [ENV-7]
+├── remitente.py                  # Cliente Gmail SMTP (puerto 587 STARTTLS) y MIME
 └── scripts/
     ├── ejecutar.py               # CLI Python con soporte --dry-run
     └── ejecutar.sh               # Entrypoint Bash ejecutable`,
                 inputs: "Email destinatario, bytes del CSV y totales por moneda.",
                 outputs: "Acuse de recibo de entrega (REAL o SIMULACION).",
-                rule: "Protección absoluta de credenciales: nunca loguea contraseñas ni expone claves personales."
+                rule: "No se expone al LLM: credenciales protegidas desde variables de entorno; nunca loguea contraseñas ni expone claves personales."
             }
         };
 
@@ -529,44 +710,44 @@
             document.getElementById('skill-rule').textContent = data.rule;
         }
 
-        // ==================== INTERACCIÓN DIAPO 2: WORKFLOW STEPPER ====================
+        // ==================== INTERACCIÓN DIAPO 4: WORKFLOW STEPPER ====================
         const stepsData = {
             1: {
                 title: "Paso 1: Diálogo de Ingesta Acumulativa",
                 badge: "ESTADO: INICIAL / EXTRAYENDO",
-                desc: "El usuario puede cargar facturas una por una o en lotes. El orquestador mantiene el lote acumulado en memoria sin reiniciar la sesión y pregunta explícitamente: '¿Deseás seguir cargando más facturas o avanzar a la revisión?'.",
-                example: `<span class="text-slate-500">// Ingesta interactiva en app.py:</span><br>
-<span class="text-emerald-400">agente.agregar_archivos([("factura_edesur.pdf", bytes)])</span><br>
-<span class="text-slate-400">Lote acumulado: 1 factura. Orquestador: ¿Desea sumar otra factura? [Sí] [Avanzar]</span><br>
-<span class="text-emerald-400">agente.agregar_archivos([("factura_telecom.pdf", bytes)])</span><br>
-<span class="text-sky-300">Lote final: 2 facturas listas para revisión conjunta en una sola agenda.</span>`
+                desc: "El usuario carga comprobantes uno a uno o en lote. El orquestador acumula los comprobantes en memoria sin reiniciar la sesión y formula la pregunta de coordinación: '¿Deseás seguir cargando más facturas o avanzar al control de revisión y confirmación?'.",
+                example: `<span class="text-slate-500">// Coordinación de ingesta en app.py:</span><br>
+<span class="text-emerald-400">orquestador.agregar_archivos([("factura_edesur_luz.pdf", bytes)])</span><br>
+<span class="text-slate-400">Coordinación: "Tenés 1 comprobante listo. ¿Deseás seguir cargando o avanzar al control?"</span><br>
+<span class="text-emerald-400">orquestador.agregar_archivos([("factura_telecom_internet.pdf", bytes)])</span><br>
+<span class="text-sky-300">Lote acumulado: 2 comprobantes listos para validación conjunta.</span>`
             },
             2: {
                 title: "Paso 2: Extracción con Evidencia Textual de Respaldo",
                 badge: "SKILL: extraer-vencimiento",
-                desc: "Se invoca pasivamente pypdf sobre cada archivo. Los importes se parsean con notación argentina (25.000,50). Se retiene la cadena textual exacta donde apareció el dato para auditoría completa.",
-                example: `<span class="text-slate-500">// Evidencia textual extraída:</span><br>
+                desc: "Se invoca pypdf sobre cada comprobante del lote. Los importes se parsean con notación argentina (25.000,50). Se retiene la cadena textual exacta donde apareció el dato para auditoría completa.",
+                example: `<span class="text-slate-500">// Evidencia textual extraída en FacturaExtraida:</span><br>
 <span class="text-slate-300">archivo_origen:</span> "factura_edesur_luz.pdf"<br>
-<span class="text-slate-300">importe_parseado:</span> 14250.00 ARS<br>
-<span class="text-emerald-300">evidencia_texto:</span> {"importe": "Total a Pagar $ 14.250,00", "vto": "Vencimiento: 15/06/2026"}`
+<span class="text-slate-300">importe_parseado:</span> 25430.75 ARS<br>
+<span class="text-emerald-300">evidencia_texto:</span> {"importe": "TOTAL A PAGAR: ARS 25.430,75", "vto": "FECHA DE VENCIMIENTO: 15/06/2026"}`
             },
             3: {
-                title: "Paso 3: Punto de Control Humano (Human-in-the-Loop)",
+                title: "Paso 3: Punto de Control Humano Obligatorio (Human-in-the-Loop)",
                 badge: "ESTADO: REVISION_REQUERIDA",
-                desc: "El agente se detiene obligatoriamente. Si una factura no tiene texto (escaneo) o faltan campos obligatorios, el sistema BLOQUEA el avance hacia la agenda hasta que el usuario corrija los datos o marque 'Excluir comprobante'.",
+                desc: "El orquestador detiene el avance. Si una factura no tiene texto (escaneo) o faltan campos obligatorios, el sistema BLOQUEA el avance hacia la agenda hasta que el usuario corrija los datos o marque 'Excluir comprobante'.",
                 example: `<span class="text-amber-400 font-bold">⚠️ CASO BORDE DETECTADO:</span> "factura_sin_texto.pdf" no contiene capa de texto.<br>
-<span class="text-rose-400">agente.validar_y_confirmar() ➔ Rechazado (Falta empresa, importe y fecha).</span><br>
-<span class="text-emerald-400">Acción del Usuario: Marca 'Excluir comprobante' ➔ Validación exitosa.</span>`
+<span class="text-rose-400">orquestador.confirmar_datos() ➔ Bloqueado (Falta empresa, importe y fecha).</span><br>
+<span class="text-emerald-400">Acción del Usuario: Marca 'Excluir comprobante' ➔ Validación exitosa (DATOS_CONFIRMADOS).</span>`
             },
             4: {
                 title: "Paso 4: Ordenamiento y Agenda Regional en CSV",
                 badge: "ESTADO: AGENDA_LISTA",
                 desc: "Se invoca ordenar-vencimientos (desempate: fecha ➔ empresa ➔ archivo) y luego generar-agenda. Se exporta agenda_vencimientos.csv con delimitador ';' y codificación UTF-8 con BOM. Los totales de ARS y USD se informan estrictamente por separado.",
-                example: `<span class="text-slate-500">// agenda_vencimientos.csv (UTF-8 con BOM):</span><br>
+                example: `<span class="text-slate-500">// agenda_vencimientos.csv (UTF-8 con BOM y CRLF limpio):</span><br>
 Vencimiento;Empresa;Servicio;Importe;Moneda;Archivo de origen<br>
-<span class="text-sky-300">15/05/2026;Telecom;Internet;8.900,00;ARS;factura_telecom.pdf</span><br>
-<span class="text-sky-300">15/06/2026;Edesur;Luz;14.250,00;ARS;factura_edesur.pdf</span><br>
-<span class="text-emerald-400">Total a pagar ARS: $ 23.150,00 | Total a pagar USD: U$S 45,00 (Sin mezclar)</span>`
+<span class="text-sky-300">28/05/2026;Telecom;Internet;148.950,25;ARS;factura_telecom_internet.pdf</span><br>
+<span class="text-sky-300">15/06/2026;Edesur;Luz;25.430,75;ARS;factura_edesur_luz.pdf</span><br>
+<span class="text-emerald-400">Total a pagar ARS: $ 174.381,00 | Total a pagar USD: U$S 45,50 (Sin mezclar)</span>`
             }
         };
 
@@ -586,7 +767,7 @@ Vencimiento;Empresa;Servicio;Importe;Moneda;Archivo de origen<br>
             document.getElementById('step-example').innerHTML = data.example;
         }
 
-        // ==================== INTERACCIÓN DIAPO 3: SIMULADOR DE ENVÍO ====================
+        // ==================== INTERACCIÓN DIAPO 5: SIMULADOR DE ENVÍO ====================
         function simularEnvio() {
             const email = document.getElementById('demo-email').value.trim();
             const isDryRun = document.getElementById('demo-dryrun').checked;
@@ -600,10 +781,10 @@ Vencimiento;Empresa;Servicio;Importe;Moneda;Archivo de origen<br>
 
             if (isDryRun) {
                 res.className = "text-[10px] p-2 rounded-lg bg-sky-950/60 border border-sky-500/40 text-sky-200 font-mono";
-                res.innerHTML = `✅ [MODO SIMULACION EDUCATIVO]: Correo validado para '<strong>${email}</strong>'. Adjunto 'agenda_vencimientos.csv' (354 bytes UTF-8 BOM) empaquetado exitosamente. Status: HTTP 200 OK.`;
+                res.innerHTML = `✅ [MODO SIMULACION (dry-run)]: Correo validado para '<strong>${email}</strong>'. Adjunto 'agenda_vencimientos.csv' (UTF-8 BOM con CRLF limpio) empaquetado exitosamente. Status: SIMULACION OK.`;
             } else {
                 res.className = "text-[10px] p-2 rounded-lg bg-amber-950/60 border border-amber-500/40 text-amber-200 font-mono";
-                res.innerHTML = `⚠️ Modo Real: Conectando a <code>smtp.gmail.com:587</code>... Requiere Contraseña de Aplicación de 16 caracteres en .env.`;
+                res.innerHTML = `⚠️ Modo Real: Conectando a <code>smtp.gmail.com:587</code> vía STARTTLS... Requiere GMAIL_REMITENTE y GMAIL_APP_PASSWORD en .env.`;
             }
         }
     </script>
