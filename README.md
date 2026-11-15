@@ -15,7 +15,7 @@ flowchart TD
     Usuario([Usuario]) -->|1. Carga comprobantes PDF| UI[Interfaz Streamlit / CLI]
     UI -->|2. Inicia procesamiento| Orq["Skill Orquestadora: organizar-vencimientos (OrquestadorVencimientos)"]
 
-    subgraph Registro ["Descubrimiento Dinámico de Skills (core/skill_loader.py)"]
+    subgraph Registro ["Registro de skills desde SKILL.md (core/skill_loader.py)"]
         Orq -->|Lee metadatos YAML y ESQUEMA_ENTRADA| Discovery[Descubrimiento de Skills]
         Discovery -.-> S1["extraer-vencimiento/SKILL.md"]
         Discovery -.-> S2["ordenar-vencimientos/SKILL.md"]
@@ -119,7 +119,7 @@ venceclaro/
 │   ├── llm.py                     # Cliente LLM unificado (Gemini con Tool Calling, fallback determinista)
 │   ├── models.py                  # Modelos Pydantic, DTOs y enumeración EstadoProceso
 │   ├── parser_utils.py            # Utilidades deterministas de fechas e importes argentinos
-│   └── skill_loader.py            # Descubrimiento dinámico de skills e inspección de SKILL.md
+│   └── skill_loader.py            # Registro de skills desde SKILL.md
 ├── skills/                        # Colección de skills modulares
 │   ├── organizar-vencimientos/    # Skill Orquestadora (Stateful)
 │   │   ├── SKILL.md               # Contrato, metadatos y especificación de orquestación

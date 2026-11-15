@@ -138,11 +138,11 @@
                 <div class="glass-panel p-4 rounded-2xl border-slate-700/80 flex flex-col justify-between hover:border-rose-500/50 transition">
                     <div>
                         <div class="text-2xl mb-1">🛡️</div>
-                        <span class="text-xs font-bold text-rose-400 uppercase tracking-wider block">0 Alucinaciones</span>
+                        <span class="text-xs font-bold text-rose-400 uppercase tracking-wider block">Valores solo desde código</span>
                         <h3 class="text-sm font-extrabold text-white mt-0.5">Guardas Deterministas</h3>
                     </div>
                     <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
-                        Cálculos numéricos, orden cronológico y fechas 100% en código. El LLM jamás inventa datos ni importes.
+                        Importes, fechas y monedas los produce el extractor determinista y los valida el usuario. El LLM solo redacta resúmenes y saludos.
                     </p>
                 </div>
             </div>
@@ -170,7 +170,7 @@
         <section id="slide-2" class="slide p-6 justify-start space-y-4">
             <div>
                 <div class="inline-block text-xs uppercase tracking-wider text-sky-400 font-semibold mb-0.5">Diseño Modular y Descubrimiento en Runtime</div>
-                <h2 class="text-xl font-black text-white">2. Arquitectura del Orquestador y Descubrimiento Dinámico de Skills</h2>
+                <h2 class="text-xl font-black text-white">2. Arquitectura del Orquestador y Registro de skills desde SKILL.md</h2>
                 <p class="text-xs text-slate-400 max-w-4xl">
                     <code>core/skill_loader.py</code> descubre las skills inspeccionando sus contratos <code>SKILL.md</code>. Cada skill expone la función de contrato <code>invocar(entrada: dict) -> dict</code> y su <code>ESQUEMA_ENTRADA</code> validado con Pydantic.
                 </p>
