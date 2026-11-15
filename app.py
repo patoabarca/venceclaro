@@ -128,9 +128,11 @@ st.markdown(
 
 # Indicador de modo LLM vs determinista
 if orquestador.usar_llm and orquestador.cliente_llm:
-    st.success("🤖 **Modo Agente con LLM Activo (Anthropic Claude)**: El orquestador usa Tool Calling para delegar en las skills.")
+    proveedor_txt = "Google Gemini" if orquestador.proveedor_llm == "gemini" else "Anthropic Claude"
+    st.success(f"🤖 **Modo Agente con LLM Activo ({proveedor_txt})**: El orquestador usa Tool Calling para delegar en las skills.")
 else:
-    st.info("⚡ **Modo Determinista Activo**: No se detectó `ANTHROPIC_API_KEY`. El orquestador ejecuta el flujo con guardas deterministas.")
+    msg_err = orquestador.error_llm or "No se detectó `GEMINI_API_KEY` en `.env`. El orquestador ejecuta el flujo con guardas deterministas."
+    st.info(f"⚡ **Modo Determinista Activo**: {msg_err}")
 
 with st.expander("ℹ️ Acerca de la arquitectura de 5 skills de VenceClaro", expanded=False):
     st.markdown(

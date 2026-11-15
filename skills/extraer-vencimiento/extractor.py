@@ -260,11 +260,7 @@ ESQUEMA_ENTRADA = {
     "properties": {
         "archivo": {
             "type": "string",
-            "description": "Nombre o ruta del archivo de factura en PDF a procesar.",
-        },
-        "contenido_bytes": {
-            "type": "string",
-            "description": "Contenido binario opcional en memoria (si no se lee desde disco).",
+            "description": "Nombre del archivo de factura en PDF a procesar.",
         },
     },
     "required": ["archivo"],

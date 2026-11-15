@@ -1,6 +1,6 @@
 ---
 name: organizar-vencimientos
-description: Skill orquestadora de VenceClaro. Dueña del flujo completo y del agente con LLM (Anthropic Claude). Descubre las skills especializadas según su SKILL.md, evalúa sus herramientas mediante tool-calling, aplica guardas de estado deterministas, gestiona el punto de control humano y el despacho final de correo. Usar como punto de entrada de alto nivel para organizar facturas de servicios.
+description: Skill orquestadora de VenceClaro. Dueña del flujo completo y del agente con LLM (Google Gemini / Anthropic opcional). Descubre las skills especializadas según su SKILL.md, evalúa sus herramientas mediante tool-calling, aplica guardas de estado deterministas, gestiona el punto de control humano y el despacho final de correo. Usar como punto de entrada de alto nivel para organizar facturas de servicios.
 ---
 
 # Procedimiento de la Skill: organizar-vencimientos
@@ -8,7 +8,7 @@ description: Skill orquestadora de VenceClaro. Dueña del flujo completo y del a
 ## Distinción entre la Skill Orquestadora y las Skills Especializadas
 La skill `organizar-vencimientos` es la dueña del flujo y del agente:
 - Descubre dinámicamente las skills registradas a partir de sus `SKILL.md` y `ESQUEMA_ENTRADA`.
-- Usa un Modelo de Lenguaje (Anthropic Claude) mediante llamadas a herramientas (*Tool Calling*) para decidir qué skill ejecutar, cuándo pausar para revisión y redactar resúmenes explicativos.
+- Usa un Modelo de Lenguaje (Google Gemini por defecto, o Anthropic Claude configurable con `LLM_PROVIDER=anthropic`) mediante llamadas a herramientas (*Tool Calling*) para decidir qué skill ejecutar, cuándo pausar para revisión y redactar resúmenes explicativos.
 - Aplica **guardas de estado deterministas en código**: el LLM no calcula importes, no altera fechas, no inventa destinatarios ni puede saltarse la revisión humana obligatoria.
 - Ofrece un **modo sin LLM (fallback determinista)** cuando no hay clave configurada o se solicita expresamente.
 
@@ -21,7 +21,7 @@ Gestionar el ciclo de vida completo de organización de vencimientos de facturas
 - **auto_confirmar**: (Opcional) Bandera para confirmar automáticamente si no hay ambigüedades.
 - **enviar_a**: (Opcional) Dirección de correo electrónico validada para despachar la agenda.
 - **dry_run**: (Opcional) Si es True, simula el envío sin conectar a la red.
-- **sin_llm**: (Opcional) Si es True, fuerza la ejecución determinista sin invocar a Claude.
+- **sin_llm**: (Opcional) Si es True, fuerza la ejecución determinista sin invocar al LLM.
 
 ## Pasos de Ejecución
 1. **Descubrimiento de Skills y Herramientas**:

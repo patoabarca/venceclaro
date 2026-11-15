@@ -14,6 +14,7 @@ class LlamadaHerramienta:
     id: str
     nombre: str
     argumentos: Dict[str, Any]
+    thought_signature: Optional[Any] = None
 
 
 @dataclass
@@ -161,12 +162,14 @@ class ClienteGemini(ClienteLLM):
                                 if tool_id and nombre_fn:
                                     id_a_nombre_herramienta[tool_id] = nombre_fn
                                 argumentos = bloque.get("input") or bloque.get("args") or {}
-                                partes_model.append(
-                                    types.Part.from_function_call(
-                                        name=nombre_fn,
-                                        args=argumentos,
-                                    )
+                                thought_sig = bloque.get("thought_signature")
+                                part_call = types.Part.from_function_call(
+                                    name=nombre_fn,
+                                    args=argumentos,
                                 )
+                                if thought_sig is not None:
+                                    part_call.thought_signature = thought_sig
+                                partes_model.append(part_call)
                     if partes_model:
                         contents.append(types.Content(role="model", parts=partes_model))
 
@@ -178,7 +181,9 @@ class ClienteGemini(ClienteLLM):
                             if tipo == "tool_result":
                                 tool_id = bloque.get("tool_use_id", "")
                                 nombre_fn = bloque.get("name") or id_a_nombre_herramienta.get(tool_id, "herramienta")
-                                raw_res = bloque.get("content", {})
+                                raw_res = bloque.get("response_dict")
+                                if raw_res is None:
+                                    raw_res = bloque.get("content", {})
                                 if isinstance(raw_res, dict):
                                     resp_dict = raw_res
                                 elif isinstance(raw_res, str):
@@ -246,11 +251,13 @@ class ClienteGemini(ClienteLLM):
                             call_id = f"gemini_call_{uuid.uuid4().hex[:8]}"
                             nombre_call = part.function_call.name
                             args_call = dict(part.function_call.args) if part.function_call.args else {}
+                            thought_sig = getattr(part, "thought_signature", None)
                             llamadas.append(
                                 LlamadaHerramienta(
                                     id=call_id,
                                     nombre=nombre_call,
                                     argumentos=args_call,
+                                    thought_signature=thought_sig,
                                 )
                             )
 

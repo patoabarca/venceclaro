@@ -217,3 +217,162 @@ def test_fallback_sin_llm_produce_mismo_csv(tmp_path):
     assert salida_csv.exists()
     assert "Telecom" in res["agenda_csv"]
     assert "Edesur" in res["agenda_csv"]
+
+
+def test_a1_envio_agenda_reenvia_credenciales_usuario_sin_variables_entorno(monkeypatch):
+    """A.1 _ejecutar_herramienta reenvía remitente y password a skill.invocar. Test con smtplib mockeado y sin variables de entorno."""
+    monkeypatch.delenv("GMAIL_REMITENTE", raising=False)
+    monkeypatch.delenv("GMAIL_APP_PASSWORD", raising=False)
+    monkeypatch.delenv("EMAIL_REMITENTE", raising=False)
+    monkeypatch.delenv("EMAIL_PASSWORD", raising=False)
+
+    orquestador = OrquestadorVencimientos(usar_llm=False)
+    archivos = [("factura_edesur_luz.pdf", EJEMPLOS_DIR / "factura_edesur_luz.pdf")]
+    orquestador.procesar_archivos_iniciales(archivos)
+    orquestador.validar_y_confirmar(orquestador.registros_revision)
+
+    with patch("smtplib.SMTP") as mock_smtp_cls:
+        instancia_mock = MagicMock()
+        mock_smtp_cls.return_value.__enter__.return_value = instancia_mock
+
+        exito, msg, modo = orquestador.despachar_agenda_por_correo(
+            destinatario="destinatario@example.com",
+            remitente="remitente_explicit@gmail.com",
+            password="app-password-16-ch",
+            dry_run=False,
+            autorizacion_usuario=True,
+        )
+
+        assert exito is True
+        assert modo == "REAL"
+        instancia_mock.login.assert_called_once_with("remitente_explicit@gmail.com", "app-password-16-ch")
+
+
+def test_a2_solicitar_revision_humana_valida_solo_en_extraccion_y_agenda_se_genera_tras_confirmacion():
+    """A.2 solicitar_revision_humana válida solo en EXTRAYENDO o REVISION_REQUERIDA; en otro estado devuelve error y no toca self.estado. Test con LLM falso que la llama tras la confirmación."""
+    resp_extraccion = RespuestaLLM(
+        texto="Extrayendo",
+        llamadas_herramientas=[
+            LlamadaHerramienta("c1", "extraer-vencimiento", {"archivo": "factura_edesur_luz.pdf"}),
+            LlamadaHerramienta("c2", "solicitar_revision_humana", {"resumen_extraccion": "Factura Edesur lista"}),
+        ],
+    )
+    # LLM falso que tras confirmación intenta convocar revisión humana indebidamente,
+    # pero luego ordena y genera la agenda
+    resp_post_conf = RespuestaLLM(
+        texto="Llamando revisión post-confirmación indebidamente",
+        llamadas_herramientas=[
+            LlamadaHerramienta("c3", "solicitar_revision_humana", {"resumen_extraccion": "Intento inválido"}),
+            LlamadaHerramienta("c4", "ordenar-vencimientos", {}),
+            LlamadaHerramienta("c5", "generar-agenda", {}),
+        ],
+    )
+    cliente_falso = ClienteLLMFalso([resp_extraccion, resp_post_conf])
+    orquestador = OrquestadorVencimientos(cliente_llm=cliente_falso, usar_llm=True)
+    archivos = [("factura_edesur_luz.pdf", EJEMPLOS_DIR / "factura_edesur_luz.pdf")]
+
+    regs = orquestador.procesar_archivos_iniciales(archivos)
+    assert orquestador.estado == EstadoProceso.REVISION_REQUERIDA
+
+    # Confirmamos las facturas para pasar a DATOS_CONFIRMADOS y disparar el bucle post-confirmación
+    exito, errores = orquestador.validar_y_confirmar(regs)
+    assert exito is True
+
+    # Verificar en la traza que la llamada indebida a solicitar_revision_humana fue rechazada con error de guarda
+    trazas_rev = [t for t in orquestador.traza if t.skill_invocada == "solicitar_revision_humana"]
+    assert len(trazas_rev) == 2
+    # La segunda llamada debe contener el error de guarda
+    assert "Guarda de estado violada" in trazas_rev[1].resultado_resumen
+
+    # Y la agenda se genera igual
+    assert orquestador.estado == EstadoProceso.AGENDA_LISTA
+    assert orquestador.agenda_csv is not None
+    assert len(orquestador.registros_ordenados) == 1
+
+
+def test_a3_extraer_vencimiento_rechaza_rutas_fuera_de_memoria_y_quita_contenido_bytes():
+    """A.3 extraer-vencimiento acepta solo nombres en memoria (nombre base) y rechaza /tmp/otro.pdf y ../x.pdf. Quita contenido_bytes del esquema expuesto al LLM."""
+    resp_ataque = RespuestaLLM(
+        texto="Intentando extraer rutas fuera de memoria",
+        llamadas_herramientas=[
+            LlamadaHerramienta("c1", "extraer-vencimiento", {"archivo": "/tmp/otro.pdf"}),
+            LlamadaHerramienta("c2", "extraer-vencimiento", {"archivo": "../x.pdf"}),
+            LlamadaHerramienta("c3", "extraer-vencimiento", {"archivo": "factura_edesur_luz.pdf"}),
+            LlamadaHerramienta("c4", "solicitar_revision_humana", {"resumen_extraccion": "Listo"}),
+        ],
+    )
+    cliente_falso = ClienteLLMFalso([resp_ataque])
+    orquestador = OrquestadorVencimientos(cliente_llm=cliente_falso, usar_llm=True)
+    archivos = [("factura_edesur_luz.pdf", EJEMPLOS_DIR / "factura_edesur_luz.pdf")]
+
+    # 1. Comprobar que el esquema no expone contenido_bytes
+    herramientas = orquestador._obtener_definiciones_herramientas(envio_autorizado=False)
+    h_ext = next(h for h in herramientas if h["name"] == "extraer-vencimiento")
+    assert "contenido_bytes" not in h_ext["input_schema"].get("properties", {})
+
+    regs = orquestador.procesar_archivos_iniciales(archivos)
+
+    # 2. Comprobar que en la traza /tmp/otro.pdf y ../x.pdf fueron rechazadas
+    trazas_ext = [t for t in orquestador.traza if t.skill_invocada == "extraer-vencimiento"]
+    res_otro = next(t for t in trazas_ext if t.argumentos.get("archivo") == "/tmp/otro.pdf")
+    res_x = next(t for t in trazas_ext if t.argumentos.get("archivo") == "../x.pdf")
+
+    assert "Archivo no permitido o inexistente en memoria" in res_otro.resultado_resumen
+    assert "Archivo no permitido o inexistente en memoria" in res_x.resultado_resumen
+
+    # 3. Solo la factura autorizada en memoria fue procesada
+    assert len(regs) == 1
+    assert regs[0].archivo_origen == "factura_edesur_luz.pdf"
+
+
+def test_a4_serializacion_json_y_function_response_dict_real():
+    """A.4 Serializar resultados de herramientas con json.dumps y verificar que _traducir_historial arme response con dict real."""
+    import json
+    from core.llm import ClienteGemini
+
+    resp = RespuestaLLM(
+        texto="Extrayendo",
+        llamadas_herramientas=[
+            LlamadaHerramienta("c1", "extraer-vencimiento", {"archivo": "factura_edesur_luz.pdf"}),
+            LlamadaHerramienta("c2", "solicitar_revision_humana", {"resumen_extraccion": "Listo"}),
+        ],
+    )
+    cliente_falso = ClienteLLMFalso([resp])
+    orquestador = OrquestadorVencimientos(cliente_llm=cliente_falso, usar_llm=True)
+    archivos = [("factura_edesur_luz.pdf", EJEMPLOS_DIR / "factura_edesur_luz.pdf")]
+    orquestador.procesar_archivos_iniciales(archivos)
+
+    # Verificar que el resultado de cada paso en la traza sea JSON válido (no repr str() con comillas simples)
+    for paso in orquestador.traza:
+        data = json.loads(paso.resultado_resumen)
+        assert isinstance(data, dict)
+
+    # Verificar que ClienteGemini._traducir_historial coloque un dict real en function_response.response
+    with patch("google.genai.Client"):
+        cli_gemini = ClienteGemini(api_key="gemini-key")
+        historial_prueba = [
+            {
+                "role": "assistant",
+                "content": [
+                    {"type": "tool_use", "id": "call_1", "name": "extraer-vencimiento", "input": {"archivo": "factura_edesur_luz.pdf"}}
+                ],
+            },
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "tool_result",
+                        "tool_use_id": "call_1",
+                        "name": "extraer-vencimiento",
+                        "content": json.dumps({"status": "ok", "empresa": "Edesur"}, ensure_ascii=False),
+                        "response_dict": {"status": "ok", "empresa": "Edesur"},
+                    }
+                ],
+            },
+        ]
+        contents = cli_gemini._traducir_historial(historial_prueba)
+        part_user = contents[1].parts[0]
+        assert part_user.function_response is not None
+        assert isinstance(part_user.function_response.response, dict)
+        assert part_user.function_response.response == {"status": "ok", "empresa": "Edesur"}
+

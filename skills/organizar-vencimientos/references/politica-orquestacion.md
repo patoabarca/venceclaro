@@ -5,7 +5,7 @@
 - No duplica la lógica de bajo nivel de extracción, ordenamiento, formato CSV ni envío SMTP; delega cada tarea en su respectiva skill especializada descubierta mediante `SKILL.md`.
 
 ## 2. Coordinación mediante LLM y Tool Calling
-- El orquestador utiliza un Modelo de Lenguaje (Anthropic Claude) al que le presenta las skills como herramientas (*tools*) descritas por sus metadatos YAML y `ESQUEMA_ENTRADA`.
+- El orquestador utiliza un Modelo de Lenguaje (Google Gemini por defecto, o Anthropic Claude opcional con `LLM_PROVIDER=anthropic`) al que le presenta las skills como herramientas (*tools*) descritas por sus metadatos YAML y `ESQUEMA_ENTRADA`.
 - El LLM decide qué skill invocar y en qué secuencia, y redacta explicaciones accesibles para el usuario.
 - **Guardas Deterministas Inquebrantables:**
   - El LLM **nunca calcula, altera ni redondea** importes, fechas o monedas.
@@ -23,4 +23,4 @@
 - El LLM jamás inventa un destinatario. Las credenciales de Gmail nunca pasan por el modelo ni se registran en trazas de auditoría.
 
 ## 5. Modo sin LLM (Fallback Determinista)
-- Si no se encuentra configurada la variable `ANTHROPIC_API_KEY` o se especifica el argumento `--sin-llm`, el orquestador opera de manera determinista ejecutando la misma secuencia reglamentaria sin interrupciones.
+- Si no se encuentra configurada la variable `GEMINI_API_KEY` (o `ANTHROPIC_API_KEY` en modo anthropic) o se especifica el argumento `--sin-llm`, el orquestador opera de manera determinista ejecutando la misma secuencia reglamentaria sin interrupciones.

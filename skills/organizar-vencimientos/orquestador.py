@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import sys
 from dataclasses import dataclass, field
@@ -139,6 +140,7 @@ class OrquestadorVencimientos:
         self.mensajes_estado.clear()
         self.traza.clear()
         self.resumen_llm = None
+        self.error_llm = None
         self._archivos_en_memoria.clear()
 
     def registrar_paso(
@@ -169,10 +171,16 @@ class OrquestadorVencimientos:
         for nombre in ["extraer-vencimiento", "ordenar-vencimientos", "generar-agenda"]:
             if nombre in skills:
                 sk = obtener_skill(nombre)
+                esquema = dict(sk.esquema_entrada)
+                if nombre == "extraer-vencimiento":
+                    # Quitar contenido_bytes del esquema que se le expone al LLM
+                    props = dict(esquema.get("properties", {}))
+                    props.pop("contenido_bytes", None)
+                    esquema["properties"] = props
                 herramientas.append({
                     "name": sk.nombre,
                     "description": sk.descripcion,
-                    "input_schema": sk.esquema_entrada,
+                    "input_schema": esquema,
                 })
 
         if envio_autorizado and "enviar-agenda" in skills:
@@ -205,7 +213,13 @@ class OrquestadorVencimientos:
     # Ejecución de Herramientas con Guardas de Estado Deterministas
     # -------------------------------------------------------------------------
     def _ejecutar_herramienta(
-        self, nombre: str, args: Dict[str, Any], envio_autorizado: bool = False, destinatario_usuario: Optional[str] = None
+        self,
+        nombre: str,
+        args: Dict[str, Any],
+        envio_autorizado: bool = False,
+        destinatario_usuario: Optional[str] = None,
+        remitente_usuario: Optional[str] = None,
+        password_usuario: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Ejecuta la herramienta de forma segura, validando contra la máquina de estados.
@@ -214,10 +228,15 @@ class OrquestadorVencimientos:
         if nombre == "extraer-vencimiento":
             archivo_ref = args.get("archivo", "")
             nombre_solo = Path(archivo_ref).name
-            contenido_b = self._archivos_en_memoria.get(nombre_solo)
+            if not nombre_solo or nombre_solo not in self._archivos_en_memoria:
+                return {
+                    "error": f"Archivo no permitido o inexistente en memoria: '{archivo_ref}'. "
+                             f"Solo se permite procesar archivos previamente cargados por el usuario."
+                }
+            contenido_b = self._archivos_en_memoria[nombre_solo]
 
             skill = obtener_skill("extraer-vencimiento")
-            res = skill.invocar({"archivo": archivo_ref, "contenido_bytes": contenido_b})
+            res = skill.invocar({"archivo": nombre_solo, "contenido_bytes": contenido_b})
             obj: FacturaExtraida = res["objeto"]
 
             # Guardar en estado si no existe ya
@@ -238,6 +257,11 @@ class OrquestadorVencimientos:
             }
 
         elif nombre == "solicitar_revision_humana":
+            if self.estado not in (EstadoProceso.EXTRAYENDO, EstadoProceso.REVISION_REQUERIDA):
+                return {
+                    "error": f"Guarda de estado violada: No se puede solicitar revisión humana en estado '{self.estado.value}'. "
+                             "La revisión humana solo es válida durante o inmediatamente después de la extracción."
+                }
             self.resumen_llm = args.get("resumen_extraccion", "")
             self.estado = EstadoProceso.REVISION_REQUERIDA
             return {
@@ -289,11 +313,13 @@ class OrquestadorVencimientos:
                     "error": "Guarda de estado violada: No se puede enviar correo sin una agenda definitiva generada."
                 }
 
-            # El destinatario SIEMPRE proviene del usuario validado
+            # El destinatario, remitente y password provienen del usuario/sistema, NUNCA del LLM
             dest_final = destinatario_usuario or args.get("destinatario", "")
             skill = obtener_skill("enviar-agenda")
             res = skill.invocar({
                 "destinatario": dest_final,
+                "remitente": remitente_usuario,
+                "password": password_usuario,
                 "csv_bytes": self.agenda_csv_bytes,
                 "totales_por_moneda": self.totales_por_moneda,
                 "dry_run": args.get("dry_run", False),
@@ -390,7 +416,8 @@ class OrquestadorVencimientos:
                     system_prompt=SYSTEM_PROMPT_ORQUESTADOR,
                 )
             except Exception as e:
-                self.mensajes_estado.append(f"Falla del cliente LLM ({e}). Continuando con fallback determinista.")
+                self.error_llm = f"Falla del cliente LLM ({e}). Se continúa con ejecución determinista."
+                self.mensajes_estado.append(self.error_llm)
                 # Fallback para archivos restantes
                 for a in archivos_a_extraer:
                     if not any(r.archivo_origen == a for r in self.registros_extraidos):
@@ -408,10 +435,11 @@ class OrquestadorVencimientos:
             llamadas_procesadas = []
             for call in respuesta.llamadas_herramientas:
                 res_tool = self._ejecutar_herramienta(call.nombre, call.argumentos)
+                resultado_serializado = json.dumps(res_tool, ensure_ascii=False, default=str)
                 self.registrar_paso(
                     skill=call.nombre,
                     argumentos=call.argumentos,
-                    resultado=str(res_tool),
+                    resultado=resultado_serializado,
                     razon_llm=respuesta.texto,
                 )
                 llamadas_procesadas.append((call, res_tool))
@@ -420,7 +448,13 @@ class OrquestadorVencimientos:
             turn_assistant: Dict[str, Any] = {
                 "role": "assistant",
                 "content": [
-                    {"type": "tool_use", "id": c.id, "name": c.nombre, "input": c.argumentos}
+                    {
+                        "type": "tool_use",
+                        "id": c.id,
+                        "name": c.nombre,
+                        "input": c.argumentos,
+                        "thought_signature": getattr(c, "thought_signature", None),
+                    }
                     for c, _ in llamadas_procesadas
                 ],
             }
@@ -435,7 +469,9 @@ class OrquestadorVencimientos:
                     {
                         "type": "tool_result",
                         "tool_use_id": c.id,
-                        "content": str(res_t),
+                        "name": c.nombre,
+                        "content": json.dumps(res_t, ensure_ascii=False, default=str),
+                        "response_dict": res_t if isinstance(res_t, dict) else {"output": res_t},
                     }
                     for c, res_t in llamadas_procesadas
                 ],
@@ -565,7 +601,8 @@ class OrquestadorVencimientos:
                     system_prompt=SYSTEM_PROMPT_ORQUESTADOR,
                 )
             except Exception as e:
-                self.mensajes_estado.append(f"Aviso LLM ({e}). Pasando a ejecución determinista.")
+                self.error_llm = f"Falla del cliente LLM ({e}). Se continúa con ejecución determinista."
+                self.mensajes_estado.append(self.error_llm)
                 break
 
             if not respuesta.llamadas_herramientas:
@@ -574,10 +611,11 @@ class OrquestadorVencimientos:
             llamadas_procesadas = []
             for call in respuesta.llamadas_herramientas:
                 res_tool = self._ejecutar_herramienta(call.nombre, call.argumentos)
+                resultado_serializado = json.dumps(res_tool, ensure_ascii=False, default=str)
                 self.registrar_paso(
                     skill=call.nombre,
                     argumentos=call.argumentos,
-                    resultado=str(res_tool),
+                    resultado=resultado_serializado,
                     razon_llm=respuesta.texto,
                 )
                 llamadas_procesadas.append((call, res_tool))
@@ -585,7 +623,13 @@ class OrquestadorVencimientos:
             turn_assistant: Dict[str, Any] = {
                 "role": "assistant",
                 "content": [
-                    {"type": "tool_use", "id": c.id, "name": c.nombre, "input": c.argumentos}
+                    {
+                        "type": "tool_use",
+                        "id": c.id,
+                        "name": c.nombre,
+                        "input": c.argumentos,
+                        "thought_signature": getattr(c, "thought_signature", None),
+                    }
                     for c, _ in llamadas_procesadas
                 ],
             }
@@ -599,7 +643,9 @@ class OrquestadorVencimientos:
                     {
                         "type": "tool_result",
                         "tool_use_id": c.id,
-                        "content": str(res_t),
+                        "name": c.nombre,
+                        "content": json.dumps(res_t, ensure_ascii=False, default=str),
+                        "response_dict": res_t if isinstance(res_t, dict) else {"output": res_t},
                     }
                     for c, res_t in llamadas_procesadas
                 ],
@@ -651,13 +697,13 @@ class OrquestadorVencimientos:
             "enviar-agenda",
             {
                 "destinatario": destinatario,
-                "remitente": remitente,
-                "password": password,
                 "dry_run": dry_run,
                 "texto_intro": texto_intro,
             },
             envio_autorizado=autorizacion_usuario,
             destinatario_usuario=destinatario,
+            remitente_usuario=remitente,
+            password_usuario=password,
         )
 
         exito = res.get("exito", False)
@@ -718,6 +764,8 @@ def coordinar_organizacion_vencimientos(
             for p in orquestador.traza
         ],
         "resumen_llm": orquestador.resumen_llm,
+        "error_llm": orquestador.error_llm,
+        "proveedor_llm": orquestador.proveedor_llm,
         "envio": None,
     }
 
@@ -754,6 +802,8 @@ def coordinar_organizacion_vencimientos(
 
         resultado["estado"] = orquestador.estado.value
         resultado["mensajes"] = list(orquestador.mensajes_estado)
+        resultado["error_llm"] = orquestador.error_llm
+        resultado["proveedor_llm"] = orquestador.proveedor_llm
         resultado["registros_ordenados"] = [r.a_fila_agenda() for r in orquestador.registros_ordenados]
         resultado["archivos_excluidos"] = orquestador.archivos_excluidos
         resultado["agenda_csv"] = orquestador.agenda_csv

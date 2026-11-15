@@ -22,7 +22,7 @@ flowchart TD
     end
 
     subgraph AgenteLLM ["Bucle de Agente con LLM y Guardas de Estado"]
-        Orq <-->|Prompt + Herramientas <-> Tool Call| LLM["LLM: Anthropic Claude / Fallback Determinista"]
+        Orq <-->|Prompt + Herramientas <-> Tool Call| LLM["LLM: Google Gemini / Fallback Determinista"]
         Orq -->|Guarda de Estado y Validación| Ejecutor[Despachador de Herramientas]
     end
 
@@ -56,7 +56,7 @@ flowchart TD
 1. **`organizar-vencimientos` (Skill Orquestadora)**:
    - Dueña del flujo y del agente (`OrquestadorVencimientos`).
    - Descubre dinámicamente las demás skills inspeccionando sus `SKILL.md`.
-   - Consulta al LLM (Anthropic Claude) para decidir qué herramienta ejecutar y redactar resúmenes explicativos para el usuario.
+   - Consulta al LLM (Google Gemini por defecto) para decidir qué herramienta ejecutar y redactar resúmenes explicativos para el usuario.
    - Aplica **guardas deterministas en código**: el LLM no puede saltarse la revisión humana, ni calcular importes, ni enviar correos sin autorización.
 2. **`extraer-vencimiento` (Skill Especializada)**:
    - Transforma cada documento PDF con texto seleccionable en un registro estructurado (`FacturaExtraida`), preservando la evidencia textual de respaldo.
@@ -98,9 +98,16 @@ flowchart TD
 Creá un archivo `.env` en la raíz de `venceclaro` (basado en `.env.example`):
 
 ```bash
-# 1. Clave de API de Anthropic Claude (para el Agente Orquestador con LLM)
-ANTHROPIC_API_KEY=tu_clave_de_anthropic_aqui
-LLM_MODEL=claude-3-5-sonnet-20241022
+# 1. Configuración del Agente Orquestador con LLM (Google Gemini por defecto)
+LLM_PROVIDER=gemini
+# Obtené tu clave gratuita en https://aistudio.google.com/apikey:
+GEMINI_API_KEY=tu_clave_de_gemini_aqui
+LLM_MODEL=gemini-2.5-flash
+
+# (Opcional) Configuración alternativa para Anthropic Claude:
+# LLM_PROVIDER=anthropic
+# ANTHROPIC_API_KEY=tu_clave_de_anthropic_aqui
+# LLM_MODEL=claude-3-5-sonnet-20241022
 
 # 2. Credenciales para envío real por Gmail (Skill: enviar-agenda)
 GMAIL_REMITENTE=tu_cuenta@gmail.com
@@ -109,7 +116,7 @@ GMAIL_APP_PASSWORD=abcd efgh ijkl mnop
 ```
 
 > [!NOTE]
-> **Modo sin LLM (Fallback Determinista):** Si no contás con una clave de Anthropic, el sistema funciona automáticamente en modo determinista local con guardas de estado completas.
+> **Modo sin LLM (Fallback Determinista):** Si no contás con una clave de Gemini (`GEMINI_API_KEY`), el sistema funciona automáticamente en modo determinista local con guardas de estado completas.
 
 ---
 

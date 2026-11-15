@@ -49,7 +49,7 @@ def main():
     parser.add_argument(
         "--sin-llm",
         action="store_true",
-        help="Ejecuta en modo puramente determinista sin invocar a Anthropic Claude.",
+        help="Ejecuta en modo puramente determinista sin invocar a Google Gemini.",
     )
     parser.add_argument(
         "--json",
@@ -83,6 +83,9 @@ def main():
         print(f"Estado final: {resultado['estado']}")
         for msg in resultado["mensajes"]:
             print(f"  * {msg}")
+
+        if resultado.get("error_llm"):
+            print(f"\n[Aviso LLM]: {resultado['error_llm']}")
 
         if resultado.get("resumen_llm"):
             print(f"\n[Resumen del Agente]: {resultado['resumen_llm']}")
